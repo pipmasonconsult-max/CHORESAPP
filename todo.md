@@ -125,6 +125,13 @@
 - [ ] Test PWA opens without browser UI on iPad
 
 ## Kid Creation Error Handling
-- [ ] Add error toast messages to kid creation form
-- [ ] Display detailed error messages from API responses
+- [x] Add error toast messages to kid creation form
+- [x] Display detailed error messages from API responses
 - [ ] Test error messages on Railway deployment
+
+## Railway Full Testing & Fixes
+- [ ] Test registration on Railway
+- [ ] Test kid creation on Railway
+- [ ] Fix any database schema issues
+- [ ] Verify migrations run correctly
+- [ ] Ensure all features work end-to-end
