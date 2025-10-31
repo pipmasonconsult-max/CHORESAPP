@@ -123,3 +123,8 @@
 - [x] Create 192x192 and 512x512 PWA icons
 - [x] Create apple-touch-icon.png
 - [ ] Test PWA opens without browser UI on iPad
+
+## Kid Creation Error Handling
+- [ ] Add error toast messages to kid creation form
+- [ ] Display detailed error messages from API responses
+- [ ] Test error messages on Railway deployment
