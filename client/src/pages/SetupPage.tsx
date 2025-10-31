@@ -85,17 +85,20 @@ export default function SetupPage() {
         
         fetchKids();
       } else {
-        const data = await response.json();
+        const data = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Kid creation failed:', { status: response.status, data });
         toast({
-          title: "Failed to create profile",
-          description: data.error,
+          title: `Failed to create profile (${response.status})`,
+          description: data.error || JSON.stringify(data),
           variant: "destructive",
+
         });
       }
     } catch (error) {
+      console.error('Kid creation error:', error);
       toast({
         title: "Error",
-        description: "Failed to connect to server",
+        description: `Failed to connect to server: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: "destructive",
       });
     } finally {
