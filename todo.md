@@ -68,3 +68,9 @@
 - [x] Play music on loop when task starts
 - [x] Stop music when task completes
 - [x] Test music playback functionality
+
+## Railway Deployment Fix
+- [x] Fix OAUTH_SERVER_URL environment variable validation
+- [x] Fix path.resolve error with undefined paths
+- [x] Make OAuth optional for Railway deployment
+- [ ] Test deployment on Railway
