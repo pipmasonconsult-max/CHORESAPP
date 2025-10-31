@@ -16,7 +16,7 @@ export async function createKid(kidData: InsertKid): Promise<Kid> {
   if (!db) throw new Error("Database not available");
   
   const result = await db.insert(kids).values(kidData);
-  const insertId = (result as any).insertId;
+  const insertId = (result as any)[0]?.insertId || (result as any).insertId;
   const [newKid] = await db.select().from(kids).where(eq(kids.id, Number(insertId)));
   return newKid;
 }
@@ -85,7 +85,7 @@ export async function createCustomChore(choreData: InsertChore): Promise<Chore> 
   if (!db) throw new Error("Database not available");
   
   const result = await db.insert(chores).values(choreData);
-  const insertId = (result as any).insertId;
+  const insertId = (result as any)[0]?.insertId || (result as any).insertId;
   const [newChore] = await db.select().from(chores).where(eq(chores.id, Number(insertId)));
   return newChore;
 }
@@ -184,7 +184,7 @@ export async function startTask(choreId: number, kidId: number): Promise<Task> {
   };
   
   const result = await db.insert(tasks).values(taskData);
-  const insertId = (result as any).insertId;
+  const insertId = (result as any)[0]?.insertId || (result as any).insertId;
   const [newTask] = await db.select().from(tasks).where(eq(tasks.id, Number(insertId)));
   return newTask;
 }
