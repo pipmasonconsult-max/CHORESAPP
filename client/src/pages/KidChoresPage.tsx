@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Camera, Check, Clock } from "lucide-react";
+import { ArrowLeft, Camera, Check, Clock, TrendingUp } from "lucide-react";
 
 interface Chore {
   id: number;
@@ -34,6 +34,7 @@ export default function KidChoresPage() {
   const [photoData, setPhotoData] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -85,6 +86,15 @@ export default function KidChoresPage() {
           paymentAmount: chore.paymentAmount,
           startTime: Date.now(),
         });
+        
+        // Start background music
+        if (!audioRef.current) {
+          audioRef.current = new Audio("/task-music.mp3");
+          audioRef.current.loop = true;
+          audioRef.current.volume = 0.3;
+        }
+        audioRef.current.play().catch(err => console.log("Audio play failed:", err));
+        
         toast({
           title: "Task started!",
           description: `Timer is running for "${chore.title}"`,
@@ -102,11 +112,20 @@ export default function KidChoresPage() {
   const handleCompleteClick = async () => {
     setShowCamera(true);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: "environment",
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        } 
+      });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        // Ensure video plays
+        await videoRef.current.play();
       }
     } catch (error) {
+      console.error("Camera error:", error);
       toast({
         title: "Camera access denied",
         description: "Please allow camera access to complete the task",
@@ -135,6 +154,12 @@ export default function KidChoresPage() {
 
   const handleSubmitTask = async () => {
     if (!activeTask || !photoData) return;
+
+    // Stop background music
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
 
     try {
       const response = await fetch(`/api/tasks/${activeTask.taskId}/complete`, {
@@ -179,14 +204,15 @@ export default function KidChoresPage() {
   if (showCamera) {
     return (
       <div className="min-h-screen bg-black flex flex-col">
-        <div className="flex-1 relative">
+        <div className="flex-1 relative overflow-hidden">
           {!photoData ? (
             <>
               <video
                 ref={videoRef}
                 autoPlay
                 playsInline
-                className="w-full h-full object-cover"
+                muted
+                className="absolute inset-0 w-full h-full object-cover"
               />
               <div className="absolute bottom-8 left-0 right-0 flex justify-center">
                 <Button
@@ -241,7 +267,15 @@ export default function KidChoresPage() {
           <h1 className="text-2xl font-bold text-indigo-600">
             Your Chores
           </h1>
-          <div className="w-10" /> {/* Spacer */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/kid/${kidId}/networth`)}
+            className="flex items-center gap-2"
+          >
+            <TrendingUp className="w-4 h-4" />
+            Net Worth
+          </Button>
         </div>
       </div>
 
