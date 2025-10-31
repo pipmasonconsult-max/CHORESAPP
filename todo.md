@@ -79,3 +79,8 @@
 - [x] Update display mode to standalone
 - [x] Add postbuild script to run database migrations
 - [ ] Test registration on Railway deployment after migration
+
+## Railway Build Fix
+- [x] Remove postbuild script (DATABASE_URL not available during build)
+- [x] Update start script to run migrations before server starts
+- [ ] Test build and deployment on Railway
