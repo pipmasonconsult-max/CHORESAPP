@@ -51,11 +51,12 @@
 - [ ] Build task completion tracking
 
 ## Phase 9: PWA & iPad Optimization
-- [ ] Add PWA manifest and service worker
+- [x] Fix PWA manifest for Android Chrome installation
+- [x] Add service worker for offline support
 - [ ] Optimize UI for iPad screen sizes
 - [ ] Implement touch-friendly controls
-- [ ] Add offline support
 - [ ] Configure app icons and splash screens
+- [ ] Test PWA installation on Android and iOS
 
 ## Phase 10: Testing & Deployment
 - [ ] Test all features end-to-end
@@ -159,5 +160,6 @@
 
 ## Camera Flow Issues
 - [x] Fix "Skip Photo & Complete" button not working (made photo optional in API)
-- [ ] Fix photo submission - after taking photo, no complete option shows
+- [ ] Fix photo submission - add Submit/Use Photo button after capture
+- [ ] Show captured photo preview before submission
 - [ ] Test complete camera flow on Railway (take photo → submit → earn money)
