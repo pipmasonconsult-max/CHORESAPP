@@ -84,3 +84,8 @@
 - [x] Remove postbuild script (DATABASE_URL not available during build)
 - [x] Update start script to run migrations before server starts
 - [ ] Test build and deployment on Railway
+
+## Database Migration Fix
+- [x] Change migrate script from "generate && migrate" to "push"
+- [x] Update start script to use correct migration command
+- [ ] Test on Railway to ensure password column is created
