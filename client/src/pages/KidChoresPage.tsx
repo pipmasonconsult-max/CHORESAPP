@@ -111,28 +111,31 @@ export default function KidChoresPage() {
 
   const handleCompleteClick = async () => {
     setShowCamera(true);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          facingMode: "environment",
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        } 
-      });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        // Ensure video plays
-        await videoRef.current.play();
+    
+    // Small delay to ensure modal renders before requesting camera
+    setTimeout(async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { 
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          } 
+        });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          await videoRef.current.play();
+        }
+      } catch (error) {
+        console.error("Camera error:", error);
+        toast({
+          title: "Camera not available",
+          description: "You can still complete the task without a photo",
+          variant: "destructive",
+        });
+        // Don't close camera modal - let user choose to cancel or skip photo
       }
-    } catch (error) {
-      console.error("Camera error:", error);
-      toast({
-        title: "Camera access denied",
-        description: "Please allow camera access to complete the task",
-        variant: "destructive",
-      });
-      setShowCamera(false);
-    }
+    }, 100);
   };
 
   const handleTakePhoto = () => {
@@ -228,6 +231,27 @@ export default function KidChoresPage() {
   if (showCamera) {
     return (
       <div className="min-h-screen bg-black flex flex-col">
+        {/* Header with cancel button */}
+        <div className="absolute top-0 left-0 right-0 z-20 p-4 flex justify-between items-center bg-gradient-to-b from-black/50 to-transparent">
+          <Button
+            variant="ghost"
+            size="lg"
+            onClick={() => {
+              // Stop camera if running
+              if (videoRef.current?.srcObject) {
+                const stream = videoRef.current.srcObject as MediaStream;
+                stream.getTracks().forEach(track => track.stop());
+              }
+              setShowCamera(false);
+              setPhotoData(null);
+            }}
+            className="text-white hover:bg-white/20"
+          >
+            ✕ Cancel
+          </Button>
+          <h2 className="text-white font-semibold">Take Photo</h2>
+          <div className="w-20"></div>
+        </div>
         <div className="flex-1 relative overflow-hidden">
           {!photoData ? (
             <>
@@ -238,13 +262,66 @@ export default function KidChoresPage() {
                 muted
                 className="absolute inset-0 w-full h-full object-cover"
               />
-              <div className="absolute bottom-8 left-0 right-0 flex justify-center">
+              <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-4">
                 <Button
                   size="lg"
                   className="rounded-full w-20 h-20"
                   onClick={handleTakePhoto}
                 >
                   <Camera className="w-10 h-10" />
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={async () => {
+                    // Complete task without photo
+                    if (!activeTask) return;
+                    
+                    // Stop camera
+                    if (videoRef.current?.srcObject) {
+                      const stream = videoRef.current.srcObject as MediaStream;
+                      stream.getTracks().forEach(track => track.stop());
+                    }
+                    
+                    // Stop music
+                    if (audioRef.current) {
+                      audioRef.current.pause();
+                      audioRef.current.currentTime = 0;
+                    }
+                    
+                    try {
+                      const response = await fetch(`/api/tasks/${activeTask.taskId}/complete`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ photo: null }),
+                      });
+                      
+                      if (response.ok) {
+                        toast({
+                          title: "Task completed! 🎉",
+                          description: `You earned $${activeTask.paymentAmount}!`,
+                        });
+                        setActiveTask(null);
+                        setElapsedTime(0);
+                        setShowCamera(false);
+                        fetchAvailableChores();
+                      } else {
+                        toast({
+                          title: "Error",
+                          description: "Failed to complete task",
+                          variant: "destructive",
+                        });
+                      }
+                    } catch (error) {
+                      toast({
+                        title: "Error",
+                        description: "Failed to complete task",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                  className="bg-white/20 text-white border-white/40 hover:bg-white/30"
+                >
+                  Skip Photo & Complete
                 </Button>
               </div>
             </>
