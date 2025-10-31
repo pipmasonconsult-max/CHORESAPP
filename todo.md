@@ -39,38 +39,34 @@
 - [x] Store completion photos with metadata
 
 ## Phase 7: Net Worth & Analytics
-- [x] Create net worth page for kids
-- [x] Show detailed task breakdowns
-- [x] Display earnings history
-- [x] Add performance metrics
+- [ ] Create net worth page for kids
+- [ ] Show detailed task breakdowns
+- [ ] Display earnings history
+- [ ] Add performance metrics
 
 ## Phase 8: Task Scheduling & Logic
-- [x] Implement task reset based on frequency
-- [x] Add first-come-first-served logic for exclusive tasks
-- [x] Create recurring task availability for personal chores
-- [x] Build task completion tracking
+- [ ] Implement task reset based on frequency
+- [ ] Add first-come-first-served logic for exclusive tasks
+- [ ] Create recurring task availability for personal chores
+- [ ] Build task completion tracking
 
 ## Phase 9: PWA & iPad Optimization
-- [x] Add PWA manifest
-- [x] Optimize UI for iPad screen sizes
-- [x] Implement touch-friendly controls
-- [x] Configure app meta tags for iOS
+- [ ] Add PWA manifest and service worker
+- [ ] Optimize UI for iPad screen sizes
+- [ ] Implement touch-friendly controls
+- [ ] Add offline support
+- [ ] Configure app icons and splash screens
 
 ## Phase 10: Testing & Deployment
-- [x] Test all features end-to-end
-- [x] Verify Railway deployment configuration
-- [x] Create user guide
-- [x] Save checkpoint for deployment
+- [ ] Test all features end-to-end
+- [ ] Verify Railway deployment configuration
+- [ ] Create user guide
+- [ ] Save checkpoint for deployment
 
-## New Feature: Background Music
-- [x] Copy SparkleandShine.mp3 to public assets
-- [x] Add audio player to KidChoresPage
-- [x] Play music on loop when task starts
-- [x] Stop music when task completes
-- [x] Test music playback functionality
-
-## Railway Deployment Fix
-- [x] Fix OAUTH_SERVER_URL environment variable validation
-- [x] Fix path.resolve error with undefined paths
-- [x] Make OAuth optional for Railway deployment
-- [ ] Test deployment on Railway
+## Railway Deployment Crash Investigation
+- [x] Check Railway deployment logs
+- [x] Verify build script configuration
+- [x] Ensure all production dependencies are installed
+- [x] Fix path.resolve error using fileURLToPath for ESM
+- [ ] Test production build locally
+- [ ] Deploy and verify on Railway

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Camera, Check, Clock, TrendingUp } from "lucide-react";
+import { ArrowLeft, Camera, Check, Clock } from "lucide-react";
 
 interface Chore {
   id: number;
@@ -34,7 +34,6 @@ export default function KidChoresPage() {
   const [photoData, setPhotoData] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -86,14 +85,6 @@ export default function KidChoresPage() {
           paymentAmount: chore.paymentAmount,
           startTime: Date.now(),
         });
-        
-        // Start playing background music
-        if (audioRef.current) {
-          audioRef.current.play().catch(err => {
-            console.log("Audio autoplay prevented:", err);
-          });
-        }
-        
         toast({
           title: "Task started!",
           description: `Timer is running for "${chore.title}"`,
@@ -153,12 +144,6 @@ export default function KidChoresPage() {
       });
 
       if (response.ok) {
-        // Stop background music
-        if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current.currentTime = 0;
-        }
-        
         toast({
           title: "Task completed! 🎉",
           description: `You earned $${activeTask.paymentAmount}!`,
@@ -288,29 +273,6 @@ export default function KidChoresPage() {
           </div>
         </div>
       )}
-
-      {/* Quick Access to Net Worth */}
-      {!activeTask && (
-        <div className="max-w-7xl mx-auto px-6 pt-6">
-          <Button
-            onClick={() => navigate(`/kid/${kidId}/networth`)}
-            variant="outline"
-            size="lg"
-            className="w-full border-2 border-indigo-300 hover:bg-indigo-50"
-          >
-            <TrendingUp className="w-5 h-5 mr-2" />
-            View My Net Worth & Stats
-          </Button>
-        </div>
-      )}
-
-      {/* Background Music */}
-      <audio
-        ref={audioRef}
-        src="/SparkleandShine.mp3"
-        loop
-        preload="auto"
-      />
 
       {/* Chores List */}
       <div className="max-w-7xl mx-auto px-6 py-8">
