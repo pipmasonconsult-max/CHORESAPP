@@ -108,7 +108,12 @@
 - [x] Verify migrations run successfully (password column created!)
 - [x] Test registration on Railway
 - [x] Fix NaN insertId issue in registration (check result[0].insertId)
-- [ ] Test kid profile creation
+- [x] Test kid profile creation
+- [x] Fix "Add Kid" button not adding new kids (fixed insertId extraction)
+- [x] Debug kid profile creation API endpoint
+- [x] Fix insertId extraction in database helpers (createKid, createCustomChore, startTask)
+- [x] Add password column to users table via SQL
+- [x] Make openId column nullable via SQL
 
 ## MAHI Rebranding
 - [x] Create MAHI logo and app icons

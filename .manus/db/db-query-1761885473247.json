@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE users ADD COLUMN password text;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2gMNjhBd6xPeT3x.60e134f717f5 --database Htw3cE7SaezoTSkr3yUY4b --execute ALTER TABLE users ADD COLUMN password text;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1929
+}
