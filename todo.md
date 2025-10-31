@@ -72,3 +72,10 @@
 - [x] Verify fileURLToPath works in production build
 - [x] Fix vite.config.ts to use fileURLToPath
 - [ ] Deploy and verify on Railway
+
+## iPad PWA & Registration Fixes
+- [x] Fix PWA manifest for full-screen iPad display
+- [x] Add proper viewport-fit meta tag for iPad
+- [x] Update display mode to standalone
+- [x] Add postbuild script to run database migrations
+- [ ] Test registration on Railway deployment after migration
