@@ -1,20 +1,27 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import Home from "./pages/Home";
+import LandingPage from "./pages/LandingPage";
+import SetupPage from "./pages/SetupPage";
+import ChoreSetupPage from "./pages/ChoreSetupPage";
+import DashboardPage from "./pages/DashboardPage";
+import KidChoresPage from "./pages/KidChoresPage";
+import NetWorthPage from "./pages/NetWorthPage";
 
 function Router() {
-  // make sure to consider if you need authentication for certain routes
   return (
-    <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/setup" element={<SetupPage />} />
+      <Route path="/chores" element={<ChoreSetupPage />} />
+      <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/kid/:kidId/chores" element={<KidChoresPage />} />
+      <Route path="/kid/:kidId/networth" element={<NetWorthPage />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 
@@ -32,7 +39,9 @@ function App() {
       >
         <TooltipProvider>
           <Toaster />
-          <Router />
+          <BrowserRouter>
+            <Router />
+          </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
