@@ -142,9 +142,10 @@
 ## Settings & Camera Bugs
 - [x] Fix settings page 404 error (SettingsPage created)
 - [x] Investigate settings route configuration (route added)
-- [x] Fix camera display showing blank screen (added video constraints and styling)
-- [ ] Fix job completion not working after taking photo
-- [ ] Test camera permissions and functionality
+- [ ] Fix camera display showing blank screen (still not working)
+- [ ] Fix job completion not working after taking photo (submit button does nothing)
+- [ ] Test and debug camera permissions and video stream
+- [ ] Debug task completion API endpoint
 - [x] Create Net Worth page to show kid's total earnings
 - [x] Add Net Worth navigation button to KidChoresPage
 - [x] Fix background music not looping when task is initiated (audio plays/loops during tasks)
