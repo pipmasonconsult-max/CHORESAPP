@@ -1,6 +1,6 @@
 {
-  "name": "Pocket Money & Chore Tracker",
-  "short_name": "Chore Tracker",
+  "name": "MAHI - Chore & Pocket Money Tracker",
+  "short_name": "MAHI",
   "description": "Teach kids responsibility while earning their pocket money",
   "start_url": "/",
   "display": "standalone",

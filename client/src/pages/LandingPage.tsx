@@ -92,8 +92,9 @@ export default function LandingPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
       <div className="w-full max-w-4xl">
         <div className="text-center mb-8">
+          <img src="/mahi-logo.png" alt="MAHI" className="h-24 mx-auto mb-4" />
           <h1 className="text-5xl font-bold text-indigo-600 mb-3">
-            💰 Pocket Money & Chore Tracker
+            MAHI
           </h1>
           <p className="text-xl text-gray-600">
             Teach kids responsibility while earning their pocket money

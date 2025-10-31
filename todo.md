@@ -109,4 +109,12 @@
 - [x] Test registration on Railway
 - [x] Fix NaN insertId issue in registration (check result[0].insertId)
 - [ ] Test kid profile creation
-- [ ] Fix any identified issues
+
+## MAHI Rebranding
+- [x] Create MAHI logo and app icons
+- [x] Update app name to MAHI in manifest.json
+- [x] Update app title in index.html
+- [x] Update branding in landing page
+- [x] Create 192x192 and 512x512 PWA icons
+- [x] Create apple-touch-icon.png
+- [ ] Test PWA opens without browser UI on iPad
