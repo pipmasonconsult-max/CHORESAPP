@@ -103,4 +103,10 @@
 ## Database Reset Endpoint
 - [x] Create /api/admin/reset-database endpoint
 - [x] Add password protection to reset endpoint
-- [ ] Deploy to Railway and call endpoint to reset tables
+- [x] Deploy to Railway
+- [x] Call reset endpoint to drop tables
+- [x] Verify migrations run successfully (password column created!)
+- [x] Test registration on Railway
+- [x] Fix NaN insertId issue in registration (check result[0].insertId)
+- [ ] Test kid profile creation
+- [ ] Fix any identified issues

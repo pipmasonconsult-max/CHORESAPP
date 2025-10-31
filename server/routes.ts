@@ -46,8 +46,13 @@ export function registerRoutes(app: Express) {
         role: "user",
       });
       
-      const insertId = (result as any).insertId;
-      const userId = typeof insertId === 'bigint' ? Number(insertId) : parseInt(String(insertId), 10);
+      // Drizzle MySQL returns [ResultSetHeader] where insertId is in result[0]
+      const insertId = (result as any)[0]?.insertId || (result as any).insertId;
+      if (!insertId) {
+        console.error("Insert result:", JSON.stringify(result, (key, value) => typeof value === 'bigint' ? value.toString() : value));
+        throw new Error("Failed to get insertId from database");
+      }
+      const userId = typeof insertId === 'bigint' ? Number(insertId) : Number(insertId);
       const [newUser] = await db.select().from(users).where(eq(users.id, userId));
       
       // Initialize pre-populated chores for new user
