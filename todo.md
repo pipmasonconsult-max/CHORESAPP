@@ -142,10 +142,17 @@
 ## Settings & Camera Bugs
 - [x] Fix settings page 404 error (SettingsPage created)
 - [x] Investigate settings route configuration (route added)
-- [ ] Fix camera display showing blank screen (still not working)
-- [ ] Fix job completion not working after taking photo (submit button does nothing)
-- [ ] Test and debug camera permissions and video stream
-- [ ] Debug task completion API endpoint
+- [x] Fix camera not opening on iPad/Safari (added delay and better constraints)
+- [x] Add back/cancel button to camera modal
+- [x] Improve camera error handling and user feedback
+- [x] Add fallback option to complete task without photo (Skip Photo button)
+- [ ] Test camera on iOS Safari with proper constraints
 - [x] Create Net Worth page to show kid's total earnings
 - [x] Add Net Worth navigation button to KidChoresPage
 - [x] Fix background music not looping when task is initiated (audio plays/loops during tasks)
+
+## Chore Loading Issues
+- [ ] Fix chores not appearing in kid's chore list
+- [ ] Debug chore fetching API endpoint
+- [ ] Verify chore_assignments table relationships
+- [ ] Test chore creation and assignment flow
