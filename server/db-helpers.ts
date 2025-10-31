@@ -191,7 +191,7 @@ export async function startTask(choreId: number, kidId: number): Promise<Task> {
 
 export async function completeTask(
   taskId: number,
-  photoUrl: string
+  photoUrl: string | null
 ): Promise<Task> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
