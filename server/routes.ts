@@ -47,7 +47,8 @@ export function registerRoutes(app: Express) {
       });
       
       const insertId = (result as any).insertId;
-      const [newUser] = await db.select().from(users).where(eq(users.id, Number(insertId)));
+      const userId = typeof insertId === 'bigint' ? Number(insertId) : parseInt(String(insertId), 10);
+      const [newUser] = await db.select().from(users).where(eq(users.id, userId));
       
       // Initialize pre-populated chores for new user
       await initializePrePopulatedChores(newUser.id);

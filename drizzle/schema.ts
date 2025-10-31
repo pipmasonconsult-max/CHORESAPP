@@ -18,7 +18,7 @@ export const users = mysqlTable("users", {
 
 // Kids profiles table
 export const kids = mysqlTable("kids", {
-  id: serial("id").primaryKey(),
+  id: int("id").primaryKey().autoincrement(),
   userId: int("user_id").references(() => users.id).notNull(),
   name: text("name").notNull(),
   birthday: timestamp("birthday").notNull(),
@@ -30,7 +30,7 @@ export const kids = mysqlTable("kids", {
 
 // Chores table (templates)
 export const chores = mysqlTable("chores", {
-  id: serial("id").primaryKey(),
+  id: int("id").primaryKey().autoincrement(),
   userId: int("user_id").references(() => users.id).notNull(),
   title: text("title").notNull(),
   description: text("description"),
@@ -43,7 +43,7 @@ export const chores = mysqlTable("chores", {
 
 // Chore assignments (which kids can do which chores)
 export const choreAssignments = mysqlTable("chore_assignments", {
-  id: serial("id").primaryKey(),
+  id: int("id").primaryKey().autoincrement(),
   choreId: int("chore_id").references(() => chores.id).notNull(),
   kidId: int("kid_id").references(() => kids.id).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -51,7 +51,7 @@ export const choreAssignments = mysqlTable("chore_assignments", {
 
 // Task instances (actual chore completions)
 export const tasks = mysqlTable("tasks", {
-  id: serial("id").primaryKey(),
+  id: int("id").primaryKey().autoincrement(),
   choreId: int("chore_id").references(() => chores.id).notNull(),
   kidId: int("kid_id").references(() => kids.id).notNull(),
   startedAt: timestamp("started_at"),

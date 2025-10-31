@@ -15,6 +15,13 @@
       "when": 1761874022447,
       "tag": "0001_silky_hulk",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1761881933001,
+      "tag": "0002_flippant_selene",
+      "breakpoints": true
     }
   ]
 }

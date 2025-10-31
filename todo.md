@@ -89,3 +89,13 @@
 - [x] Change migrate script from "generate && migrate" to "push"
 - [x] Update start script to use correct migration command
 - [ ] Test on Railway to ensure password column is created
+
+## Registration 500 Error Fix
+- [x] Check Railway logs for migration errors
+- [x] Verify drizzle-kit push is actually running
+- [x] Found Issue 1: Foreign key constraint error (chore_id incompatible with id)
+- [x] Found Issue 2: Registration returns NaN for user ID
+- [x] Fix foreign key column types in schema (changed serial to int autoincrement)
+- [x] Fix registration logic to properly handle BigInt insertId
+- [ ] Drop existing Railway database tables
+- [ ] Deploy and test on Railway
