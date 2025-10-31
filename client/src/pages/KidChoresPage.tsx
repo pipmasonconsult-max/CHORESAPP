@@ -153,7 +153,17 @@ export default function KidChoresPage() {
   };
 
   const handleSubmitTask = async () => {
-    if (!activeTask || !photoData) return;
+    console.log("Submit task called", { activeTask, hasPhoto: !!photoData });
+    
+    if (!activeTask || !photoData) {
+      console.error("Missing data:", { activeTask, hasPhoto: !!photoData });
+      toast({
+        title: "Error",
+        description: "Missing task or photo data",
+        variant: "destructive",
+      });
+      return;
+    }
 
     // Stop background music
     if (audioRef.current) {
@@ -162,13 +172,18 @@ export default function KidChoresPage() {
     }
 
     try {
+      console.log("Submitting task:", activeTask.taskId);
       const response = await fetch(`/api/tasks/${activeTask.taskId}/complete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ photo: photoData }),
       });
 
+      console.log("Response status:", response.status);
+      
       if (response.ok) {
+        const result = await response.json();
+        console.log("Task completed successfully:", result);
         toast({
           title: "Task completed! 🎉",
           description: `You earned $${activeTask.paymentAmount}!`,
@@ -178,11 +193,20 @@ export default function KidChoresPage() {
         setShowCamera(false);
         setPhotoData(null);
         fetchAvailableChores();
+      } else {
+        const errorText = await response.text();
+        console.error("Task completion failed:", response.status, errorText);
+        toast({
+          title: "Error",
+          description: `Failed to complete task (${response.status})`,
+          variant: "destructive",
+        });
       }
     } catch (error) {
+      console.error("Task completion error:", error);
       toast({
         title: "Error",
-        description: "Failed to complete task",
+        description: error instanceof Error ? error.message : "Failed to complete task",
         variant: "destructive",
       });
     }
