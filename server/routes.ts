@@ -1,5 +1,5 @@
-import type { Express } from "express";
-import { eq } from "drizzle-orm";
+import { Express } from "express";
+import { eq, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { getDb } from "./db";
 import { users } from "../drizzle/schema";
@@ -440,6 +440,40 @@ export function registerRoutes(app: Express) {
     } catch (error) {
       console.error("Error fetching earnings:", error);
       res.status(500).json({ error: "Failed to fetch earnings" });
+    }
+  });
+  
+  // ============ Admin Routes ============
+  
+  // Database reset endpoint (for Railway deployment)
+  app.post("/api/admin/reset-database", async (req, res) => {
+    try {
+      const { password } = req.body;
+      
+      // Simple password protection
+      if (password !== "reset-chores-db-2025") {
+        return res.status(403).json({ error: "Invalid password" });
+      }
+      
+      const db = await getDb();
+      if (!db) {
+        return res.status(500).json({ error: "Database not available" });
+      }
+      
+      // Drop all tables
+      await db.execute(sql`SET FOREIGN_KEY_CHECKS = 0`);
+      await db.execute(sql`DROP TABLE IF EXISTS tasks`);
+      await db.execute(sql`DROP TABLE IF EXISTS chore_assignments`);
+      await db.execute(sql`DROP TABLE IF EXISTS chores`);
+      await db.execute(sql`DROP TABLE IF EXISTS kids`);
+      await db.execute(sql`DROP TABLE IF EXISTS users`);
+      await db.execute(sql`DROP TABLE IF EXISTS __drizzle_migrations`);
+      await db.execute(sql`SET FOREIGN_KEY_CHECKS = 1`);
+      
+      res.json({ success: true, message: "Database reset complete. Please restart the server to run migrations." });
+    } catch (error) {
+      console.error("Error resetting database:", error);
+      res.status(500).json({ error: "Failed to reset database" });
     }
   });
 }

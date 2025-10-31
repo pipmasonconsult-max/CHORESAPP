@@ -99,3 +99,8 @@
 - [x] Fix registration logic to properly handle BigInt insertId
 - [ ] Drop existing Railway database tables
 - [ ] Deploy and test on Railway
+
+## Database Reset Endpoint
+- [x] Create /api/admin/reset-database endpoint
+- [x] Add password protection to reset endpoint
+- [ ] Deploy to Railway and call endpoint to reset tables
