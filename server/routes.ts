@@ -396,18 +396,19 @@ export function registerRoutes(app: Express) {
       const taskId = parseInt(req.params.taskId);
       const { photo } = req.body;
       
-      if (!photo) {
-        return res.status(400).json({ error: "Photo required" });
+      let photoUrl = null;
+      
+      // Upload photo to S3 if provided
+      if (photo) {
+        const base64Data = photo.replace(/^data:image\/\w+;base64,/, "");
+        const buffer = Buffer.from(base64Data, "base64");
+        const fileName = `task-${taskId}-${Date.now()}.jpg`;
+        
+        const { url } = await storagePut(fileName, buffer, "image/jpeg");
+        photoUrl = url;
       }
       
-      // Upload photo to S3
-      const base64Data = photo.replace(/^data:image\/\w+;base64,/, "");
-      const buffer = Buffer.from(base64Data, "base64");
-      const fileName = `task-${taskId}-${Date.now()}.jpg`;
-      
-      const { url } = await storagePut(fileName, buffer, "image/jpeg");
-      
-      const task = await completeTask(taskId, url);
+      const task = await completeTask(taskId, photoUrl);
       res.json(task);
     } catch (error) {
       console.error("Error completing task:", error);

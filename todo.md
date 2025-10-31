@@ -156,3 +156,8 @@
 - [ ] Debug chore fetching API endpoint
 - [ ] Verify chore_assignments table relationships
 - [ ] Test chore creation and assignment flow
+
+## Camera Flow Issues
+- [x] Fix "Skip Photo & Complete" button not working (made photo optional in API)
+- [ ] Fix photo submission - after taking photo, no complete option shows
+- [ ] Test complete camera flow on Railway (take photo → submit → earn money)
