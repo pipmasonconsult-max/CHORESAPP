@@ -35,6 +35,7 @@ export default function KidChoresPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const photoDataRef = useRef<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -53,6 +54,12 @@ export default function KidChoresPage() {
     }
     return () => clearInterval(interval);
   }, [activeTask]);
+
+  // Debug: Log photoData changes
+  useEffect(() => {
+    console.log("[DEBUG] photoData changed:", photoData ? "HAS_PHOTO" : "NO_PHOTO");
+    console.log("[DEBUG] showCamera:", showCamera);
+  }, [photoData, showCamera]);
 
   const fetchAvailableChores = async () => {
     try {
@@ -139,6 +146,7 @@ export default function KidChoresPage() {
   };
 
   const handleTakePhoto = () => {
+    console.log("[DEBUG] handleTakePhoto called");
     if (videoRef.current && canvasRef.current) {
       const context = canvasRef.current.getContext("2d");
       if (context) {
@@ -146,19 +154,24 @@ export default function KidChoresPage() {
         canvasRef.current.height = videoRef.current.videoHeight;
         context.drawImage(videoRef.current, 0, 0);
         const photo = canvasRef.current.toDataURL("image/jpeg");
+        console.log("[DEBUG] Photo captured, length:", photo.length);
+        photoDataRef.current = photo; // Store in ref for safety
         setPhotoData(photo);
+        console.log("[DEBUG] setPhotoData called, photoDataRef:", photoDataRef.current ? "SET" : "NULL");
         
         // Stop camera
         const stream = videoRef.current.srcObject as MediaStream;
         stream?.getTracks().forEach(track => track.stop());
+        console.log("[DEBUG] Camera stopped");
       }
     }
   };
 
   const handleSubmitTask = async () => {
-    console.log("Submit task called", { activeTask, hasPhoto: !!photoData });
+    const photo = photoData || photoDataRef.current;
+    console.log("Submit task called", { activeTask, hasPhoto: !!photo });
     
-    if (!activeTask || !photoData) {
+    if (!activeTask || !photo) {
       console.error("Missing data:", { activeTask, hasPhoto: !!photoData });
       toast({
         title: "Error",
@@ -179,7 +192,7 @@ export default function KidChoresPage() {
       const response = await fetch(`/api/tasks/${activeTask.taskId}/complete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ photo: photoData }),
+        body: JSON.stringify({ photo }),
       });
 
       console.log("Response status:", response.status);
@@ -195,6 +208,7 @@ export default function KidChoresPage() {
         setElapsedTime(0);
         setShowCamera(false);
         setPhotoData(null);
+        photoDataRef.current = null;
         fetchAvailableChores();
       } else {
         const errorText = await response.text();
@@ -244,6 +258,7 @@ export default function KidChoresPage() {
               }
               setShowCamera(false);
               setPhotoData(null);
+              photoDataRef.current = null;
             }}
             className="text-white hover:bg-white/20"
           >
@@ -253,7 +268,7 @@ export default function KidChoresPage() {
           <div className="w-20"></div>
         </div>
         <div className="flex-1 relative overflow-hidden">
-          {!photoData ? (
+          {!(photoData || photoDataRef.current) ? (
             <>
               <video
                 ref={videoRef}
@@ -327,12 +342,33 @@ export default function KidChoresPage() {
             </>
           ) : (
             <>
-              <img src={photoData} alt="Task completion" className="w-full h-full object-contain" />
+              <img src={photoData || photoDataRef.current || ""} alt="Task completion" className="w-full h-full object-contain" />
               <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-4 px-4">
                 <Button
                   variant="outline"
                   size="lg"
-                  onClick={() => setPhotoData(null)}
+                  onClick={() => {
+                    setPhotoData(null);
+                    photoDataRef.current = null;
+                    // Restart camera
+                    setTimeout(async () => {
+                      try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ 
+                          video: { 
+                            facingMode: { ideal: "environment" },
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                          } 
+                        });
+                        if (videoRef.current) {
+                          videoRef.current.srcObject = stream;
+                          await videoRef.current.play();
+                        }
+                      } catch (error) {
+                        console.error("Camera error:", error);
+                      }
+                    }, 100);
+                  }}
                   className="flex-1 max-w-xs"
                 >
                   Retake
