@@ -33,6 +33,11 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
   
+  // Trust proxy for Railway/production deployments
+  if (process.env.NODE_ENV === "production") {
+    app.set("trust proxy", 1);
+  }
+  
   // Configure session middleware
   app.use(session({
     secret: process.env.JWT_SECRET || "chore-tracker-secret",
@@ -41,7 +46,8 @@ async function startServer() {
     cookie: { 
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
     }
   }));
   
