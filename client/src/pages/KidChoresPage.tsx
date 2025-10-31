@@ -34,6 +34,7 @@ export default function KidChoresPage() {
   const [photoData, setPhotoData] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -85,6 +86,14 @@ export default function KidChoresPage() {
           paymentAmount: chore.paymentAmount,
           startTime: Date.now(),
         });
+        
+        // Start playing background music
+        if (audioRef.current) {
+          audioRef.current.play().catch(err => {
+            console.log("Audio autoplay prevented:", err);
+          });
+        }
+        
         toast({
           title: "Task started!",
           description: `Timer is running for "${chore.title}"`,
@@ -144,6 +153,12 @@ export default function KidChoresPage() {
       });
 
       if (response.ok) {
+        // Stop background music
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+        }
+        
         toast({
           title: "Task completed! 🎉",
           description: `You earned $${activeTask.paymentAmount}!`,
@@ -288,6 +303,14 @@ export default function KidChoresPage() {
           </Button>
         </div>
       )}
+
+      {/* Background Music */}
+      <audio
+        ref={audioRef}
+        src="/SparkleandShine.mp3"
+        loop
+        preload="auto"
+      />
 
       {/* Chores List */}
       <div className="max-w-7xl mx-auto px-6 py-8">
