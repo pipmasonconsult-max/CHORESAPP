@@ -112,3 +112,12 @@
 - [x] Update Net Worth page to show historical periods
 - [x] Display task breakdown with time taken for each period
 - [ ] Test earnings reset flow on Railway
+
+
+## CRITICAL - Railway Deployment Crash
+- [x] App returning 502 Bad Gateway on Railway
+- [x] Root cause: Migration SQL using unsupported syntax
+- [ ] Fix migration to use proper MySQL syntax (no IF NOT EXISTS for ALTER)
+- [ ] Create migration that checks if columns exist before adding
+- [ ] OR remove problematic migration and add columns manually to Railway DB
+- [ ] Deploy working version
