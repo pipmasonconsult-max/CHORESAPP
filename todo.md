@@ -75,6 +75,12 @@
 - [ ] Custom chores appear in chore assignment list
 - [ ] Can assign custom chores to specific kids
 
+## CRITICAL - Task Completion Broken
+- [ ] Debug 500 error when completing tasks
+- [ ] Check if issue is in S3 upload or database update
+- [ ] Test with simplified completion (no photo)
+- [ ] Fix and verify tasks complete successfully
+
 
 ## Bug - Photos Not Showing
 - [x] Root cause: No completed tasks in database (task completion failing)

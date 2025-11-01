@@ -500,7 +500,11 @@ export function registerRoutes(app: Express) {
   });
   
   // Get pending tasks for parent approval
-  app.get("/api/tasks/pending", requireAuth, async (req, res) => {
+  app.get("/api/tasks/pending", async (req, res) => {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+    
     try {
       const db = await getDb();
       if (!db) {
@@ -522,7 +526,7 @@ export function registerRoutes(app: Express) {
         FROM tasks t
         JOIN kids k ON t.kidId = k.id
         JOIN chores c ON t.choreId = c.id
-        WHERE k.userId = ${req.session.userId}
+        WHERE k.userId = ${req.session!.userId}
           AND t.completedAt IS NOT NULL
           AND t.approved = FALSE
         ORDER BY t.completedAt DESC
@@ -536,7 +540,11 @@ export function registerRoutes(app: Express) {
   });
 
   // Approve a task
-  app.post("/api/tasks/:taskId/approve", requireAuth, async (req, res) => {
+  app.post("/api/tasks/:taskId/approve", async (req, res) => {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+    
     try {
       const taskId = parseInt(req.params.taskId);
       const db = await getDb();
@@ -545,13 +553,13 @@ export function registerRoutes(app: Express) {
       }
       
       // Verify task belongs to user's kid
-      const [task] = await db.execute(sql`
+      const result = await db.execute(sql`
         SELECT t.* FROM tasks t
         JOIN kids k ON t.kidId = k.id
-        WHERE t.id = ${taskId} AND k.userId = ${req.session.userId}
+        WHERE t.id = ${taskId} AND k.userId = ${req.session!.userId}
       `);
       
-      if (!task[0]) {
+      if (!result[0] || (result[0] as any[]).length === 0) {
         return res.status(404).json({ error: "Task not found" });
       }
       
@@ -568,7 +576,11 @@ export function registerRoutes(app: Express) {
   });
 
   // Reject a task (delete it)
-  app.post("/api/tasks/:taskId/reject", requireAuth, async (req, res) => {
+  app.post("/api/tasks/:taskId/reject", async (req, res) => {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+    
     try {
       const taskId = parseInt(req.params.taskId);
       const db = await getDb();
@@ -577,13 +589,13 @@ export function registerRoutes(app: Express) {
       }
       
       // Verify task belongs to user's kid
-      const [task] = await db.execute(sql`
+      const result = await db.execute(sql`
         SELECT t.* FROM tasks t
         JOIN kids k ON t.kidId = k.id
-        WHERE t.id = ${taskId} AND k.userId = ${req.session.userId}
+        WHERE t.id = ${taskId} AND k.userId = ${req.session!.userId}
       `);
       
-      if (!task[0]) {
+      if (!result[0] || (result[0] as any[]).length === 0) {
         return res.status(404).json({ error: "Task not found" });
       }
       
