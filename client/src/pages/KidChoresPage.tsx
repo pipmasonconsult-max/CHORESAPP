@@ -31,6 +31,7 @@ export default function KidChoresPage() {
   const [activeTask, setActiveTask] = useState<ActiveTask | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [showCamera, setShowCamera] = useState(false);
+  const [cameraView, setCameraView] = useState<'camera' | 'preview'>('camera'); // Track which view to show
   const [photoData, setPhotoData] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -118,6 +119,7 @@ export default function KidChoresPage() {
 
   const handleCompleteClick = async () => {
     setShowCamera(true);
+    setCameraView('camera'); // Reset to camera view
     
     // Small delay to ensure modal renders before requesting camera
     setTimeout(async () => {
@@ -157,7 +159,8 @@ export default function KidChoresPage() {
         console.log("[DEBUG] Photo captured, length:", photo.length);
         photoDataRef.current = photo; // Store in ref for safety
         setPhotoData(photo);
-        console.log("[DEBUG] setPhotoData called, photoDataRef:", photoDataRef.current ? "SET" : "NULL");
+        setCameraView('preview'); // Switch to preview view
+        console.log("[DEBUG] setPhotoData called, switching to preview view");
         
         // Stop camera
         const stream = videoRef.current.srcObject as MediaStream;
@@ -259,6 +262,7 @@ export default function KidChoresPage() {
               setShowCamera(false);
               setPhotoData(null);
               photoDataRef.current = null;
+              setCameraView('camera'); // Reset view
             }}
             className="text-white hover:bg-white/20"
           >
@@ -268,7 +272,7 @@ export default function KidChoresPage() {
           <div className="w-20"></div>
         </div>
         <div className="flex-1 relative overflow-hidden">
-          {!(photoData || photoDataRef.current) ? (
+          {cameraView === 'camera' ? (
             <>
               <video
                 ref={videoRef}
@@ -350,6 +354,7 @@ export default function KidChoresPage() {
                   onClick={() => {
                     setPhotoData(null);
                     photoDataRef.current = null;
+                    setCameraView('camera'); // Switch back to camera view
                     // Restart camera
                     setTimeout(async () => {
                       try {
