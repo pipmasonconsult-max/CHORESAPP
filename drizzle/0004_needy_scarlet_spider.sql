@@ -1,4 +1,4 @@
-CREATE TABLE `earning_periods` (
+CREATE TABLE IF NOT EXISTS `earning_periods` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`kid_id` int NOT NULL,
 	`total_earned` decimal(10,2) NOT NULL,
@@ -10,8 +10,6 @@ CREATE TABLE `earning_periods` (
 	CONSTRAINT `earning_periods_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-ALTER TABLE `kids` MODIFY COLUMN `name` varchar(255) NOT NULL;--> statement-breakpoint
-ALTER TABLE `kids` MODIFY COLUMN `birthday` date NOT NULL;--> statement-breakpoint
-ALTER TABLE `kids` MODIFY COLUMN `avatar_color` varchar(7) NOT NULL;--> statement-breakpoint
-ALTER TABLE `kids` ADD `net_wealth` decimal(10,2) DEFAULT '0' NOT NULL;--> statement-breakpoint
-ALTER TABLE `earning_periods` ADD CONSTRAINT `earning_periods_kid_id_kids_id_fk` FOREIGN KEY (`kid_id`) REFERENCES `kids`(`id`) ON DELETE no action ON UPDATE no action;
+ALTER TABLE `kids` ADD COLUMN IF NOT EXISTS `net_wealth` decimal(10,2) DEFAULT '0' NOT NULL;
+--> statement-breakpoint
+ALTER TABLE `tasks` ADD COLUMN IF NOT EXISTS `approved` boolean DEFAULT false NOT NULL;
