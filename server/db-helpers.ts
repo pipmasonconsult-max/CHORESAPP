@@ -208,6 +208,7 @@ export async function completeTask(
     completedAt,
     timeToComplete,
     photoUrl,
+    approved: false, // Require parent approval
   }).where(eq(tasks.id, taskId));
   
   const [updatedTask] = await db.select().from(tasks).where(eq(tasks.id, taskId));

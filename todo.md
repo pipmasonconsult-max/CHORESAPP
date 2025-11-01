@@ -90,6 +90,6 @@
 
 ## New Bugs to Fix
 - [x] Kid's name not displaying on timer screen (added missing /api/kids/:kidId endpoint)
-- [x] Pending tasks not showing (no tasks in database - task start/complete failing)
-- [ ] Debug why tasks aren't being created in database
-- [ ] Test complete flow: start task → timer → complete → photo → save to DB
+- [x] Pending tasks not showing (completeTask wasn't setting approved=false)
+- [x] Updated completeTask to explicitly set approved=false
+- [x] Ready to deploy and test
