@@ -58,8 +58,8 @@ export default function DashboardPage() {
   };
 
   const handleSettings = () => {
-    // Navigate to settings (password protected)
-    navigate("/settings");
+    // Navigate to parent management
+    navigate("/manage");
   };
 
   return (

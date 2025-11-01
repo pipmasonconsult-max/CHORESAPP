@@ -449,6 +449,43 @@ export function registerRoutes(app: Express) {
     }
   });
   
+  // Get all completed tasks with photos for parent view
+  app.get("/api/tasks/completed-with-photos", async (req, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
+      const db = await getDb();
+      if (!db) {
+        return res.status(500).json({ error: "Database not available" });
+      }
+      
+      // Get all completed tasks for this user's kids with photos
+      const tasks = await db.execute(sql`
+        SELECT 
+          t.id,
+          t.completedAt,
+          t.photoUrl,
+          t.timeToComplete,
+          k.name as kidName,
+          c.title as choreTitle,
+          c.paymentAmount as amountEarned
+        FROM tasks t
+        JOIN kids k ON t.kidId = k.id
+        JOIN chores c ON t.choreId = c.id
+        WHERE k.userId = ${req.session.userId}
+          AND t.status = 'completed'
+        ORDER BY t.completedAt DESC
+      `);
+      
+      res.json(tasks[0] || []);
+    } catch (error) {
+      console.error("Error fetching completed tasks with photos:", error);
+      res.status(500).json({ error: "Failed to fetch completed tasks" });
+    }
+  });
+  
   // ============ Admin Routes ============
   
   // Database reset endpoint (for Railway deployment)

@@ -147,26 +147,63 @@ export default function KidChoresPage() {
     }, 100);
   };
 
-  const handleTakePhoto = () => {
+  const handleTakePhoto = async () => {
     console.log("[DEBUG] handleTakePhoto called");
-    if (videoRef.current && canvasRef.current) {
-      const context = canvasRef.current.getContext("2d");
-      if (context) {
-        canvasRef.current.width = videoRef.current.videoWidth;
-        canvasRef.current.height = videoRef.current.videoHeight;
-        context.drawImage(videoRef.current, 0, 0);
-        const photo = canvasRef.current.toDataURL("image/jpeg");
-        console.log("[DEBUG] Photo captured, length:", photo.length);
-        photoDataRef.current = photo; // Store in ref for safety
-        setPhotoData(photo);
-        setCameraView('preview'); // Switch to preview view
-        console.log("[DEBUG] setPhotoData called, switching to preview view");
-        
-        // Stop camera
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream?.getTracks().forEach(track => track.stop());
-        console.log("[DEBUG] Camera stopped");
+    if (!videoRef.current || !canvasRef.current || !activeTask) return;
+    
+    const context = canvasRef.current.getContext("2d");
+    if (!context) return;
+    
+    // Capture photo
+    canvasRef.current.width = videoRef.current.videoWidth;
+    canvasRef.current.height = videoRef.current.videoHeight;
+    context.drawImage(videoRef.current, 0, 0);
+    const photo = canvasRef.current.toDataURL("image/jpeg");
+    console.log("[DEBUG] Photo captured, auto-completing task");
+    
+    // Stop camera
+    const stream = videoRef.current.srcObject as MediaStream;
+    stream?.getTracks().forEach(track => track.stop());
+    
+    // Stop music
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    
+    // Auto-complete task with photo
+    try {
+      const response = await fetch(`/api/tasks/${activeTask.taskId}/complete`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photo }),
+      });
+      
+      if (response.ok) {
+        toast({
+          title: "Task completed! 🎉",
+          description: `You earned $${activeTask.paymentAmount}!`,
+        });
+        setActiveTask(null);
+        setElapsedTime(0);
+        setShowCamera(false);
+        setPhotoData(null);
+        photoDataRef.current = null;
+        setCameraView('camera');
+        fetchAvailableChores();
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to complete task",
+          variant: "destructive",
+        });
       }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to complete task",
+        variant: "destructive",
+      });
     }
   };
 
@@ -272,122 +309,78 @@ export default function KidChoresPage() {
           <div className="w-20"></div>
         </div>
         <div className="flex-1 relative overflow-hidden">
-          {cameraView === 'camera' ? (
-            <>
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-4">
-                <Button
-                  size="lg"
-                  className="rounded-full w-20 h-20"
-                  onClick={handleTakePhoto}
-                >
-                  <Camera className="w-10 h-10" />
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={async () => {
-                    // Complete task without photo
-                    if (!activeTask) return;
-                    
-                    // Stop camera
-                    if (videoRef.current?.srcObject) {
-                      const stream = videoRef.current.srcObject as MediaStream;
-                      stream.getTracks().forEach(track => track.stop());
-                    }
-                    
-                    // Stop music
-                    if (audioRef.current) {
-                      audioRef.current.pause();
-                      audioRef.current.currentTime = 0;
-                    }
-                    
-                    try {
-                      const response = await fetch(`/api/tasks/${activeTask.taskId}/complete`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ photo: null }),
-                      });
-                      
-                      if (response.ok) {
-                        toast({
-                          title: "Task completed! 🎉",
-                          description: `You earned $${activeTask.paymentAmount}!`,
-                        });
-                        setActiveTask(null);
-                        setElapsedTime(0);
-                        setShowCamera(false);
-                        fetchAvailableChores();
-                      } else {
-                        toast({
-                          title: "Error",
-                          description: "Failed to complete task",
-                          variant: "destructive",
-                        });
-                      }
-                    } catch (error) {
-                      toast({
-                        title: "Error",
-                        description: "Failed to complete task",
-                        variant: "destructive",
-                      });
-                    }
-                  }}
-                  className="bg-white/20 text-white border-white/40 hover:bg-white/30"
-                >
-                  Skip Photo & Complete
-                </Button>
-              </div>
-            </>
-          ) : (
-            <>
-              <img src={photoData || photoDataRef.current || ""} alt="Task completion" className="w-full h-full object-contain" />
-              <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-4 px-4">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => {
-                    setPhotoData(null);
-                    photoDataRef.current = null;
-                    setCameraView('camera'); // Switch back to camera view
-                    // Restart camera
-                    setTimeout(async () => {
-                      try {
-                        const stream = await navigator.mediaDevices.getUserMedia({ 
-                          video: { 
-                            facingMode: { ideal: "environment" },
-                            width: { ideal: 1280 },
-                            height: { ideal: 720 }
-                          } 
-                        });
-                        if (videoRef.current) {
-                          videoRef.current.srcObject = stream;
-                          await videoRef.current.play();
-                        }
-                      } catch (error) {
-                        console.error("Camera error:", error);
-                      }
-                    }, 100);
-                  }}
-                  className="flex-1 max-w-xs"
-                >
-                  Retake
-                </Button>
-                <Button
-                  size="lg"
-                  onClick={handleSubmitTask}
-                  className="flex-1 max-w-xs"
-                >
-                  Submit & Earn ${activeTask?.paymentAmount}
-                </Button>
-              </div>
-            </>
-          )}
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-4">
+            <Button
+              size="lg"
+              className="rounded-full w-20 h-20 bg-white hover:bg-gray-100"
+              onClick={handleTakePhoto}
+            >
+              <Camera className="w-10 h-10 text-indigo-600" />
+            </Button>
+            <p className="text-white text-sm bg-black/50 px-4 py-2 rounded-full">
+              Tap to capture & complete
+            </p>
+            <Button
+              variant="outline"
+              onClick={async () => {
+                // Complete task without photo
+                if (!activeTask) return;
+                
+                // Stop camera
+                if (videoRef.current?.srcObject) {
+                  const stream = videoRef.current.srcObject as MediaStream;
+                  stream.getTracks().forEach(track => track.stop());
+                }
+                
+                // Stop music
+                if (audioRef.current) {
+                  audioRef.current.pause();
+                  audioRef.current.currentTime = 0;
+                }
+                
+                try {
+                  const response = await fetch(`/api/tasks/${activeTask.taskId}/complete`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ photo: null }),
+                  });
+                  
+                  if (response.ok) {
+                    toast({
+                      title: "Task completed! 🎉",
+                      description: `You earned $${activeTask.paymentAmount}!`,
+                    });
+                    setActiveTask(null);
+                    setElapsedTime(0);
+                    setShowCamera(false);
+                    fetchAvailableChores();
+                  } else {
+                    toast({
+                      title: "Error",
+                      description: "Failed to complete task",
+                      variant: "destructive",
+                    });
+                  }
+                } catch (error) {
+                  toast({
+                    title: "Error",
+                    description: "Failed to complete task",
+                    variant: "destructive",
+                  });
+                }
+              }}
+              className="bg-white/20 text-white border-white/40 hover:bg-white/30"
+            >
+              Skip Photo & Complete
+            </Button>
+          </div>
         </div>
         <canvas ref={canvasRef} className="hidden" />
       </div>

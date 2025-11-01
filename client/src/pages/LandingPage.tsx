@@ -32,7 +32,19 @@ export default function LandingPage() {
           title: "Welcome back!",
           description: "You have successfully logged in.",
         });
-        navigate("/setup");
+        
+        // Check if user has kids setup
+        const kidsResponse = await fetch("/api/kids");
+        if (kidsResponse.ok) {
+          const kids = await kidsResponse.json();
+          if (kids.length > 0) {
+            navigate("/dashboard");
+          } else {
+            navigate("/setup");
+          }
+        } else {
+          navigate("/setup");
+        }
       } else {
         toast({
           title: "Login failed",

@@ -11,6 +11,7 @@ import DashboardPage from "./pages/DashboardPage";
 import KidChoresPage from "./pages/KidChoresPage";
 import SettingsPage from "./pages/SettingsPage";
 import NetWorthPage from "./pages/NetWorthPage";
+import ParentManagementPage from "./pages/ParentManagementPage";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/chores" element={<ChoreSetupPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/settings" element={<SettingsPage />} />
+      <Route path="/manage" element={<ParentManagementPage />} />
       <Route path="/kid/:kidId/chores" element={<KidChoresPage />} />
       <Route path="/kid/:kidId/networth" element={<NetWorthPage />} />
       <Route path="*" element={<NotFound />} />

@@ -43,7 +43,7 @@ export default function NetWorthPage() {
       }
 
       // Fetch completed tasks
-      const tasksResponse = await fetch(`/api/kids/${kidId}/tasks/completed`);
+      const tasksResponse = await fetch(`/api/kids/${kidId}/completed-tasks`);
       if (tasksResponse.ok) {
         const completedTasks = await tasksResponse.json();
         setTasks(completedTasks);
