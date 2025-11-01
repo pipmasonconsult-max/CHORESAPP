@@ -86,3 +86,10 @@
 - [x] Root cause: No completed tasks in database (task completion failing)
 - [x] Photos will show once task completion is fixed
 - [ ] Test complete flow: take photo → upload → complete task → show in gallery
+
+
+## New Bugs to Fix
+- [x] Kid's name not displaying on timer screen (added missing /api/kids/:kidId endpoint)
+- [x] Pending tasks not showing (no tasks in database - task start/complete failing)
+- [ ] Debug why tasks aren't being created in database
+- [ ] Test complete flow: start task → timer → complete → photo → save to DB

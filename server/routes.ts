@@ -332,6 +332,28 @@ export function registerRoutes(app: Express) {
     }
   });
   
+  app.get("/api/kids/:kidId", async (req, res) => {
+    try {
+      const kidId = parseInt(req.params.kidId);
+      const db = await getDb();
+      if (!db) {
+        return res.status(500).json({ error: "Database not available" });
+      }
+      
+      const kids = await getKidsByUserId(req.session?.userId || 0);
+      const kid = kids.find(k => k.id === kidId);
+      
+      if (!kid) {
+        return res.status(404).json({ error: "Kid not found" });
+      }
+      
+      res.json(kid);
+    } catch (error) {
+      console.error("Error fetching kid:", error);
+      res.status(500).json({ error: "Failed to fetch kid" });
+    }
+  });
+  
   app.get("/api/kids/:kidId/chores", async (req, res) => {
     if (!req.session?.userId) {
       return res.status(401).json({ error: "Not authenticated" });
