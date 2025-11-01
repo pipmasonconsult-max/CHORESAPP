@@ -1,31 +1,33 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, TrendingUp, DollarSign, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, TrendingUp, Clock } from "lucide-react";
 import { toast } from "sonner";
 
-interface Task {
+interface EarningPeriod {
   id: number;
-  choreTitle: string;
-  completedAt: string;
-  amountEarned: number;
-  timeToComplete: number;
+  totalEarned: string;
+  tasksCompleted: number;
+  periodStart: string;
+  periodEnd: string;
+  taskBreakdown: string; // JSON string
 }
 
 interface Kid {
   id: number;
   name: string;
-  pocketMoneyAmount: number;
-  pocketMoneyFrequency: string;
+  netWealth: string;
+  avatarColor: string;
 }
 
 export default function NetWorthPage() {
-  const { kidId } = useParams<{ kidId: string }>();
+  const { kidId } = useParams();
   const navigate = useNavigate();
   const [kid, setKid] = useState<Kid | null>(null);
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [totalEarnings, setTotalEarnings] = useState(0);
+  const [currentEarnings, setCurrentEarnings] = useState(0);
+  const [earningPeriods, setEarningPeriods] = useState<EarningPeriod[]>([]);
+  const [expandedPeriod, setExpandedPeriod] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,55 +36,60 @@ export default function NetWorthPage() {
 
   const fetchData = async () => {
     try {
-      // Fetch kid info
-      const kidsResponse = await fetch("/api/kids");
-      if (kidsResponse.ok) {
-        const kids = await kidsResponse.json();
-        const currentKid = kids.find((k: Kid) => k.id === parseInt(kidId!));
-        setKid(currentKid);
+      // Fetch kid data
+      const kidResponse = await fetch(`/api/kids/${kidId}`);
+      if (kidResponse.ok) {
+        setKid(await kidResponse.json());
       }
 
-      // Fetch completed tasks
-      const tasksResponse = await fetch(`/api/kids/${kidId}/completed-tasks`);
-      if (tasksResponse.ok) {
-        const completedTasks = await tasksResponse.json();
-        setTasks(completedTasks);
-        
-        // Calculate total earnings
-        const total = completedTasks.reduce((sum: number, task: Task) => sum + task.amountEarned, 0);
-        setTotalEarnings(total);
+      // Fetch current earnings
+      const earningsResponse = await fetch(`/api/kids/${kidId}/earnings`);
+      if (earningsResponse.ok) {
+        const data = await earningsResponse.json();
+        setCurrentEarnings(data.total);
+      }
+
+      // Fetch earning periods
+      const periodsResponse = await fetch(`/api/kids/${kidId}/earning-periods`);
+      if (periodsResponse.ok) {
+        setEarningPeriods(await periodsResponse.json());
       }
     } catch (error) {
-      toast.error("Failed to load earnings data");
+      toast.error("Failed to load net worth data");
     } finally {
       setLoading(false);
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-  };
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}m ${secs}s`;
+  const formatTime = (ms: number) => {
+    if (!ms) return "N/A";
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    if (hours > 0) return `${hours}h ${minutes % 60}m`;
+    if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
+    return `${seconds}s`;
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading earnings...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
     );
   }
 
+  if (!kid) {
+    return <div className="p-8 text-center">Kid not found</div>;
+  }
+
+  const totalNetWealth = parseFloat(kid.netWealth || '0') + currentEarnings;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-4">
       <div className="max-w-4xl mx-auto pt-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
@@ -94,90 +101,118 @@ export default function NetWorthPage() {
           >
             <ArrowLeft className="w-6 h-6" />
           </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">{kid?.name}'s Net Worth</h1>
-            <p className="text-gray-600">Track your earnings and progress</p>
+          <div className="flex items-center gap-4">
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold"
+              style={{ backgroundColor: kid.avatarColor }}
+            >
+              {kid.name.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">{kid.name}'s Net Worth</h1>
+              <p className="text-gray-600">Track your wealth over time</p>
+            </div>
           </div>
         </div>
 
-        {/* Total Earnings Card */}
-        <Card className="mb-6 bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
+        {/* Total Net Worth Card */}
+        <Card className="mb-8 bg-gradient-to-br from-green-500 to-emerald-600 text-white border-0 shadow-xl">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-white">
-              <DollarSign className="w-6 h-6" />
-              Total Earnings
+            <CardTitle className="text-white flex items-center gap-2">
+              <TrendingUp className="w-6 h-6" />
+              Total Net Worth
             </CardTitle>
-            <CardDescription className="text-indigo-100">
-              Money earned from completed chores
+            <CardDescription className="text-green-100">
+              Current earnings + accumulated wealth
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-5xl font-bold">${totalEarnings.toFixed(2)}</div>
-            <div className="mt-4 flex items-center gap-2 text-indigo-100">
-              <TrendingUp className="w-5 h-5" />
-              <span>{tasks.length} tasks completed</span>
+            <div className="text-5xl font-bold mb-6">
+              ${totalNetWealth.toFixed(2)}
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white/20 rounded-lg p-4">
+                <div className="text-sm text-green-100 mb-1">Current Earnings</div>
+                <div className="text-2xl font-bold">${currentEarnings.toFixed(2)}</div>
+              </div>
+              <div className="bg-white/20 rounded-lg p-4">
+                <div className="text-sm text-green-100 mb-1">Accumulated Wealth</div>
+                <div className="text-2xl font-bold">${parseFloat(kid.netWealth || '0').toFixed(2)}</div>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Pocket Money Info */}
-        {kid && (
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Pocket Money Allowance</CardTitle>
-              <CardDescription>Your regular pocket money schedule</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-2xl font-bold text-indigo-600">
-                    ${kid.pocketMoneyAmount.toFixed(2)}
-                  </div>
-                  <div className="text-sm text-gray-600 capitalize">
-                    Per {kid.pocketMoneyFrequency}
-                  </div>
-                </div>
-                <Calendar className="w-12 h-12 text-indigo-200" />
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Task History */}
+        {/* Historical Earning Periods */}
         <Card>
           <CardHeader>
-            <CardTitle>Earnings History</CardTitle>
-            <CardDescription>Recent completed tasks</CardDescription>
+            <CardTitle>Earning History</CardTitle>
+            <CardDescription>
+              View past earning periods and task breakdowns
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            {tasks.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <p>No completed tasks yet!</p>
-                <p className="text-sm mt-2">Start completing chores to earn money</p>
+            {earningPeriods.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                <p>No earning history yet</p>
+                <p className="text-sm mt-2">Complete tasks to start building your wealth!</p>
               </div>
             ) : (
-              <div className="space-y-3">
-                {tasks.map((task) => (
-                  <div
-                    key={task.id}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                  >
-                    <div className="flex-1">
-                      <div className="font-medium text-gray-900">{task.choreTitle}</div>
-                      <div className="text-sm text-gray-600 flex items-center gap-4 mt-1">
-                        <span>{formatDate(task.completedAt)}</span>
-                        {task.timeToComplete && (
-                          <span className="text-indigo-600">
-                            ⏱️ {formatTime(task.timeToComplete)}
-                          </span>
-                        )}
-                      </div>
+              <div className="space-y-4">
+                {earningPeriods.map((period) => {
+                  const tasks = JSON.parse(period.taskBreakdown);
+                  const isExpanded = expandedPeriod === period.id;
+                  
+                  return (
+                    <div key={period.id} className="border rounded-lg overflow-hidden">
+                      <button
+                        onClick={() => setExpandedPeriod(isExpanded ? null : period.id)}
+                        className="w-full p-4 text-left hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-semibold text-lg">
+                              ${parseFloat(period.totalEarned).toFixed(2)}
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              {new Date(period.periodStart).toLocaleDateString()} - {new Date(period.periodEnd).toLocaleDateString()}
+                            </div>
+                            <div className="text-sm text-gray-500 mt-1">
+                              {period.tasksCompleted} tasks completed
+                            </div>
+                          </div>
+                          <div className="text-2xl">
+                            {isExpanded ? "▼" : "▶"}
+                          </div>
+                        </div>
+                      </button>
+                      
+                      {isExpanded && (
+                        <div className="border-t bg-gray-50 p-4">
+                          <h4 className="font-semibold mb-3">Task Breakdown</h4>
+                          <div className="space-y-2">
+                            {tasks.map((task: any, index: number) => (
+                              <div key={index} className="bg-white p-3 rounded border flex items-center justify-between">
+                                <div className="flex-1">
+                                  <div className="font-medium">{task.choreTitle}</div>
+                                  <div className="text-sm text-gray-600 flex items-center gap-2 mt-1">
+                                    <Clock className="w-3 h-3" />
+                                    {formatTime(task.timeToComplete)}
+                                    <span className="mx-1">•</span>
+                                    {new Date(task.completedAt).toLocaleString()}
+                                  </div>
+                                </div>
+                                <div className="text-lg font-semibold text-green-600">
+                                  ${parseFloat(task.amountEarned).toFixed(2)}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div className="text-lg font-bold text-green-600">
-                      +${task.amountEarned.toFixed(2)}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </CardContent>

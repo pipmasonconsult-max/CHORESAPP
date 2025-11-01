@@ -484,7 +484,30 @@ export function registerRoutes(app: Express) {
     }
   });
   
-  // Get all completed tasks with photos for parent view
+   // Get earning periods for a kid
+  app.get("/api/kids/:kidId/earning-periods", async (req, res) => {
+    try {
+      const kidId = parseInt(req.params.kidId);
+      const db = await getDb();
+      if (!db) {
+        return res.status(500).json({ error: "Database not available" });
+      }
+      
+      const periods = await db.execute(sql`
+        SELECT *
+        FROM earning_periods
+        WHERE kid_id = ${kidId}
+        ORDER BY period_end DESC
+      `);
+      
+      res.json(periods[0]);
+    } catch (error) {
+      console.error("Error fetching earning periods:", error);
+      res.status(500).json({ error: "Failed to fetch earning periods" });
+    }
+  });
+
+  // Get completed tasks with photos for photo gallery
   app.get("/api/tasks/completed-with-photos", async (req, res) => {
     try {
       if (!req.session?.userId) {
@@ -558,6 +581,94 @@ export function registerRoutes(app: Express) {
     } catch (error) {
       console.error("Error fetching pending tasks:", error);
       res.status(500).json({ error: "Failed to fetch pending tasks" });
+    }
+  });
+
+  // Reset kid's earnings and create earning period
+  app.post("/api/kids/:kidId/reset-earnings", async (req, res) => {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+    
+    try {
+      const kidId = parseInt(req.params.kidId);
+      const db = await getDb();
+      if (!db) {
+        return res.status(500).json({ error: "Database not available" });
+      }
+      
+      // Get kid to verify ownership
+      const kids = await getKidsByUserId(req.session.userId);
+      const kid = kids.find(k => k.id === kidId);
+      if (!kid) {
+        return res.status(404).json({ error: "Kid not found" });
+      }
+      
+      // Get all approved completed tasks for this kid
+      const completedTasks = await db.execute(sql`
+        SELECT 
+          t.id,
+          t.completedAt,
+          t.timeToComplete,
+          t.amountEarned,
+          c.title as choreTitle
+        FROM tasks t
+        JOIN chores c ON t.choreId = c.id
+        WHERE t.kidId = ${kidId}
+          AND t.completedAt IS NOT NULL
+          AND t.approved = TRUE
+        ORDER BY t.completedAt ASC
+      `);
+      
+      const tasks = completedTasks[0] as any[];
+      const totalEarned = tasks.reduce((sum, t) => sum + parseFloat(t.amountEarned || '0'), 0);
+      
+      if (tasks.length === 0) {
+        return res.status(400).json({ error: "No completed tasks to reset" });
+      }
+      
+      const periodStart = new Date(tasks[0].completedAt);
+      const periodEnd = new Date();
+      
+      // Create earning period record
+      await db.execute(sql`
+        INSERT INTO earning_periods (
+          kid_id, total_earned, tasks_completed, period_start, period_end, task_breakdown
+        ) VALUES (
+          ${kidId},
+          ${totalEarned},
+          ${tasks.length},
+          ${periodStart},
+          ${periodEnd},
+          ${JSON.stringify(tasks)}
+        )
+      `);
+      
+      // Update kid's net wealth
+      const currentNetWealth = parseFloat(kid.netWealth || '0');
+      const newNetWealth = currentNetWealth + totalEarned;
+      await db.execute(sql`
+        UPDATE kids
+        SET net_wealth = ${newNetWealth}
+        WHERE id = ${kidId}
+      `);
+      
+      // Delete all completed tasks for this kid
+      await db.execute(sql`
+        DELETE FROM tasks
+        WHERE kidId = ${kidId}
+          AND completedAt IS NOT NULL
+      `);
+      
+      res.json({
+        success: true,
+        totalEarned,
+        tasksCompleted: tasks.length,
+        newNetWealth,
+      });
+    } catch (error) {
+      console.error("Error resetting earnings:", error);
+      res.status(500).json({ error: "Failed to reset earnings" });
     }
   });
 

@@ -304,6 +304,29 @@ export default function ParentManagementPage() {
                       <div className="flex gap-2">
                         <Button
                           variant="outline"
+                          size="sm"
+                          onClick={async () => {
+                            if (!confirm(`Reset ${kid.name}'s earnings? This will move current earnings to Net Wealth and clear completed tasks.`)) return;
+                            try {
+                              const response = await fetch(`/api/kids/${kid.id}/reset-earnings`, { method: "POST" });
+                              if (response.ok) {
+                                const data = await response.json();
+                                toast.success(`Reset complete! $${data.totalEarned.toFixed(2)} moved to Net Wealth`);
+                                fetchKids();
+                                fetchPendingTasks();
+                              } else {
+                                const error = await response.json();
+                                toast.error(error.error || "Failed to reset earnings");
+                              }
+                            } catch (error) {
+                              toast.error("Failed to reset earnings");
+                            }
+                          }}
+                        >
+                          💰 Reset Earnings
+                        </Button>
+                        <Button
+                          variant="outline"
                           size="icon"
                           onClick={() => {
                             setSelectedKid(kid);

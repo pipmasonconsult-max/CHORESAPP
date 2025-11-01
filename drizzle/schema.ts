@@ -1,4 +1,4 @@
-import { mysqlTable, text, serial, int, timestamp, boolean, decimal, mysqlEnum, varchar } from "drizzle-orm/mysql-core";
+import { mysqlTable, text, serial, int, timestamp, boolean, decimal, mysqlEnum, varchar, date } from "drizzle-orm/mysql-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
 
@@ -18,13 +18,14 @@ export const users = mysqlTable("users", {
 
 // Kids profiles table
 export const kids = mysqlTable("kids", {
-  id: int("id").primaryKey().autoincrement(),
-  userId: int("user_id").references(() => users.id).notNull(),
-  name: text("name").notNull(),
-  birthday: timestamp("birthday").notNull(),
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull().references(() => users.id),
+  name: varchar("name", { length: 255 }).notNull(),
+  birthday: date("birthday").notNull(),
   pocketMoneyAmount: decimal("pocket_money_amount", { precision: 10, scale: 2 }).notNull(),
   pocketMoneyFrequency: mysqlEnum("pocket_money_frequency", ["daily", "weekly", "monthly"]).notNull(),
-  avatarColor: varchar("avatar_color", { length: 7 }).notNull().default("#4F46E5"),
+  avatarColor: varchar("avatar_color", { length: 7 }).notNull(),
+  netWealth: decimal("net_wealth", { precision: 10, scale: 2 }).default("0").notNull(), // Accumulated wealth from resets
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -50,6 +51,18 @@ export const choreAssignments = mysqlTable("chore_assignments", {
 });
 
 // Task instances (actual chore completions)
+// Earning periods - tracks each reset cycle
+export const earningPeriods = mysqlTable("earning_periods", {
+  id: int("id").autoincrement().primaryKey(),
+  kidId: int("kid_id").notNull().references(() => kids.id),
+  totalEarned: decimal("total_earned", { precision: 10, scale: 2 }).notNull(),
+  tasksCompleted: int("tasks_completed").notNull(),
+  periodStart: timestamp("period_start").notNull(),
+  periodEnd: timestamp("period_end").notNull(),
+  taskBreakdown: text("task_breakdown").notNull(), // JSON string of completed tasks
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const tasks = mysqlTable("tasks", {
   id: int("id").primaryKey().autoincrement(),
   choreId: int("chore_id").references(() => chores.id).notNull(),

@@ -101,3 +101,14 @@
 - [x] Implement time-based task filtering (morning/afternoon/evening)
 - [x] Add visual indicators (arrows, dots) for swipe gestures
 - [ ] Test swipe on mobile devices
+
+
+## Earnings Reset & Net Wealth Feature
+- [x] Create earning_periods table to track reset history
+- [x] Add netWealth field to kids table
+- [x] Create reset earnings API endpoint
+- [x] Add "Reset Earnings" button in parent settings
+- [x] Store completed tasks snapshot on reset
+- [x] Update Net Worth page to show historical periods
+- [x] Display task breakdown with time taken for each period
+- [ ] Test earnings reset flow on Railway
