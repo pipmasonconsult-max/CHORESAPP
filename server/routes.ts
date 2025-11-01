@@ -402,16 +402,21 @@ export function registerRoutes(app: Express) {
       
       // Upload photo to S3 if provided
       if (photo) {
-        console.log("[SERVER] Photo size:", photo.length, "bytes");
-        const base64Data = photo.replace(/^data:image\/\w+;base64,/, "");
-        const buffer = Buffer.from(base64Data, "base64");
-        console.log("[SERVER] Buffer size:", buffer.length, "bytes");
-        const fileName = `task-${taskId}-${Date.now()}.jpg`;
-        
-        console.log("[SERVER] Uploading to S3...");
-        const { url } = await storagePut(fileName, buffer, "image/jpeg");
-        photoUrl = url;
-        console.log("[SERVER] Photo uploaded:", photoUrl);
+        try {
+          console.log("[SERVER] Photo size:", photo.length, "bytes");
+          const base64Data = photo.replace(/^data:image\/\w+;base64,/, "");
+          const buffer = Buffer.from(base64Data, "base64");
+          console.log("[SERVER] Buffer size:", buffer.length, "bytes");
+          const fileName = `task-${taskId}-${Date.now()}.jpg`;
+          
+          console.log("[SERVER] Uploading to S3...");
+          const { url } = await storagePut(fileName, buffer, "image/jpeg");
+          photoUrl = url;
+          console.log("[SERVER] Photo uploaded:", photoUrl);
+        } catch (uploadError) {
+          console.error("[SERVER] Photo upload failed, completing task without photo:", uploadError);
+          // Continue to complete task even if photo upload fails
+        }
       }
       
       console.log("[SERVER] Completing task in database...");
