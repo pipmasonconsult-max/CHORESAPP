@@ -154,12 +154,29 @@ export default function KidChoresPage() {
     const context = canvasRef.current.getContext("2d");
     if (!context) return;
     
-    // Capture photo
-    canvasRef.current.width = videoRef.current.videoWidth;
-    canvasRef.current.height = videoRef.current.videoHeight;
-    context.drawImage(videoRef.current, 0, 0);
-    const photo = canvasRef.current.toDataURL("image/jpeg", 0.8); // Compress to 80% quality
-    console.log("[DEBUG] Photo captured, size:", photo.length, "bytes");
+    // Capture photo at reduced resolution for faster upload
+    const maxWidth = 1280; // Max width for photo
+    const maxHeight = 720; // Max height for photo
+    const videoWidth = videoRef.current.videoWidth;
+    const videoHeight = videoRef.current.videoHeight;
+    
+    // Calculate scaled dimensions maintaining aspect ratio
+    let width = videoWidth;
+    let height = videoHeight;
+    if (width > maxWidth) {
+      height = (maxWidth / width) * height;
+      width = maxWidth;
+    }
+    if (height > maxHeight) {
+      width = (maxHeight / height) * width;
+      height = maxHeight;
+    }
+    
+    canvasRef.current.width = width;
+    canvasRef.current.height = height;
+    context.drawImage(videoRef.current, 0, 0, width, height);
+    const photo = canvasRef.current.toDataURL("image/jpeg", 0.7); // Compress to 70% quality
+    console.log("[DEBUG] Photo captured, size:", photo.length, "bytes", `resolution: ${width}x${height}`);
     
     // Stop camera immediately
     const stream = videoRef.current.srcObject as MediaStream;
@@ -180,12 +197,19 @@ export default function KidChoresPage() {
     // Auto-complete task with photo
     try {
       console.log("[DEBUG] Sending completion request...");
+      
+      // Add timeout to prevent infinite freeze
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
       const response = await fetch(`/api/tasks/${activeTask.taskId}/complete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ photo }),
+        signal: controller.signal,
       });
       
+      clearTimeout(timeoutId);
       console.log("[DEBUG] Response status:", response.status);
       
       if (response.ok) {
@@ -219,9 +243,19 @@ export default function KidChoresPage() {
       }
     } catch (error) {
       console.error("[DEBUG] Exception during completion:", error);
+      
+      let errorMessage = "Failed to complete task";
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          errorMessage = "Upload timed out. Please try again with better connection.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to complete task",
+        description: errorMessage,
         variant: "destructive",
       });
       

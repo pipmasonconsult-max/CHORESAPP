@@ -45,5 +45,8 @@
 - [x] Added comprehensive logging (client and server)
 - [x] Added loading toast "Uploading photo..."
 - [x] Added error handling to close camera on failure
-- [x] Compressed photo to 80% quality to reduce size
-- [ ] Test with detailed logs to identify exact failure point
+- [x] Compressed photo to 70% quality
+- [x] Reduced photo resolution to max 1280x720 for faster upload
+- [x] Added 30-second timeout to prevent infinite freeze
+- [x] Fixed SQL query bug (status field doesn't exist, use completedAt)
+- [ ] Deploy and test on Railway - should be much faster now

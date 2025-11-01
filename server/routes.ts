@@ -483,7 +483,7 @@ export function registerRoutes(app: Express) {
         JOIN kids k ON t.kidId = k.id
         JOIN chores c ON t.choreId = c.id
         WHERE k.userId = ${req.session.userId}
-          AND t.status = 'completed'
+          AND t.completedAt IS NOT NULL
         ORDER BY t.completedAt DESC
       `);
       
