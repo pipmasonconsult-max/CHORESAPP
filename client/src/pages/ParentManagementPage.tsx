@@ -41,6 +41,7 @@ export default function ParentManagementPage() {
   const [kids, setKids] = useState<Kid[]>([]);
   const [chores, setChores] = useState<Chore[]>([]);
   const [completedTasks, setCompletedTasks] = useState<CompletedTask[]>([]);
+  const [pendingTasks, setPendingTasks] = useState<CompletedTask[]>([]);
   const [selectedKid, setSelectedKid] = useState<Kid | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
@@ -48,7 +49,50 @@ export default function ParentManagementPage() {
     fetchKids();
     fetchChores();
     fetchCompletedTasks();
+    fetchPendingTasks();
   }, []);
+
+  const fetchPendingTasks = async () => {
+    try {
+      const response = await fetch("/api/tasks/pending");
+      if (response.ok) {
+        const data = await response.json();
+        setPendingTasks(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch pending tasks:", error);
+    }
+  };
+
+  const handleApproveTask = async (taskId: number) => {
+    try {
+      const response = await fetch(`/api/tasks/${taskId}/approve`, { method: "POST" });
+      if (response.ok) {
+        toast.success("Task approved!");
+        fetchPendingTasks();
+        fetchCompletedTasks();
+      } else {
+        toast.error("Failed to approve task");
+      }
+    } catch (error) {
+      toast.error("Failed to approve task");
+    }
+  };
+
+  const handleRejectTask = async (taskId: number) => {
+    if (!confirm("Are you sure you want to reject this task? It will be deleted.")) return;
+    try {
+      const response = await fetch(`/api/tasks/${taskId}/reject`, { method: "POST" });
+      if (response.ok) {
+        toast.success("Task rejected");
+        fetchPendingTasks();
+      } else {
+        toast.error("Failed to reject task");
+      }
+    } catch (error) {
+      toast.error("Failed to reject task");
+    }
+  };
 
   const fetchKids = async () => {
     try {
@@ -146,13 +190,72 @@ export default function ParentManagementPage() {
           </div>
         </div>
 
-        <Tabs defaultValue="kids" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6">
+        <Tabs defaultValue="pending" className="w-full">
+          <TabsList className="grid w-full grid-cols-5 mb-6">
+            <TabsTrigger value="pending">
+              Pending ({pendingTasks.length})
+            </TabsTrigger>
             <TabsTrigger value="kids">Kids</TabsTrigger>
             <TabsTrigger value="chores">Chores</TabsTrigger>
-            <TabsTrigger value="photos">Photo Gallery</TabsTrigger>
+            <TabsTrigger value="photos">Photos</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
+
+          {/* Pending Approval Tab */}
+          <TabsContent value="pending">
+            <Card>
+              <CardHeader>
+                <CardTitle>Tasks Pending Approval</CardTitle>
+                <CardDescription>Review and approve completed tasks</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {pendingTasks.length === 0 ? (
+                    <div className="text-center py-12 text-gray-500">
+                      <p>No tasks pending approval</p>
+                    </div>
+                  ) : (
+                    pendingTasks.map((task) => (
+                      <div key={task.id} className="border rounded-lg p-4 flex items-start gap-4">
+                        {task.photoUrl && (
+                          <img
+                            src={task.photoUrl}
+                            alt={task.choreTitle}
+                            className="w-24 h-24 object-cover rounded"
+                          />
+                        )}
+                        <div className="flex-1">
+                          <h3 className="font-semibold">{task.choreTitle}</h3>
+                          <p className="text-sm text-gray-600">
+                            {task.kidName} • {new Date(task.completedAt).toLocaleString()}
+                          </p>
+                          <p className="text-sm text-green-600 font-medium mt-1">
+                            Earning: ${Number(task.amountEarned).toFixed(2)}
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => handleApproveTask(task.id)}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            ✓ Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleRejectTask(task.id)}
+                          >
+                            ✕ Reject
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Kids Tab */}
           <TabsContent value="kids">

@@ -59,6 +59,7 @@ export const tasks = mysqlTable("tasks", {
   timeToComplete: int("time_to_complete"), // in seconds
   photoUrl: text("photo_url"),
   amountEarned: decimal("amount_earned", { precision: 10, scale: 2 }).notNull(),
+  approved: boolean("approved").default(false).notNull(), // Parent approval status
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

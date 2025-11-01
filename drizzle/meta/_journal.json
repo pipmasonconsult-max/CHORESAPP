@@ -22,6 +22,13 @@
       "when": 1761881933001,
       "tag": "0002_flippant_selene",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1761962983948,
+      "tag": "0003_next_black_bolt",
+      "breakpoints": true
     }
   ]
 }

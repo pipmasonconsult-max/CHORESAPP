@@ -50,3 +50,33 @@
 - [x] Added 30-second timeout to prevent infinite freeze
 - [x] Fixed SQL query bug (status field doesn't exist, use completedAt)
 - [ ] Deploy and test on Railway - should be much faster now
+
+
+## New Feature Requests
+
+### Full-Screen Timer Enhancement
+- [x] Make timer bar full-screen when task is active
+- [x] Display kid's name prominently on timer screen
+- [x] Show chore title and description on timer screen
+- [x] Add "Cancel Chore" button to stop task if wrong one selected
+- [x] Make timer UI more engaging and kid-friendly
+
+### Parental Task Confirmation
+- [x] Add "Pending Approval" section in parent management
+- [x] List all completed tasks awaiting parent confirmation
+- [x] Parents can approve or reject completed tasks
+- [x] Rejected tasks don't add to earnings (task deleted)
+- [x] Added API endpoints for approve/reject
+- [ ] Update earnings calculation to only count approved tasks
+
+### Custom Chore Creation
+- [ ] Add "Create Custom Chore" button in parent management
+- [ ] Form to create custom chores with title, description, payment, frequency
+- [ ] Custom chores appear in chore assignment list
+- [ ] Can assign custom chores to specific kids
+
+
+## Bug - Photos Not Showing
+- [x] Root cause: No completed tasks in database (task completion failing)
+- [x] Photos will show once task completion is fixed
+- [ ] Test complete flow: take photo → upload → complete task → show in gallery

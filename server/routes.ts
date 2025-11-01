@@ -499,6 +499,106 @@ export function registerRoutes(app: Express) {
     }
   });
   
+  // Get pending tasks for parent approval
+  app.get("/api/tasks/pending", requireAuth, async (req, res) => {
+    try {
+      const db = await getDb();
+      if (!db) {
+        return res.status(500).json({ error: "Database not available" });
+      }
+      
+      // Get all completed but unapproved tasks for this user's kids
+      const tasks = await db.execute(sql`
+        SELECT 
+          t.id,
+          t.completedAt,
+          t.photoUrl,
+          t.timeToComplete,
+          t.amountEarned,
+          k.id as kidId,
+          k.name as kidName,
+          c.title as choreTitle,
+          c.description as choreDescription
+        FROM tasks t
+        JOIN kids k ON t.kidId = k.id
+        JOIN chores c ON t.choreId = c.id
+        WHERE k.userId = ${req.session.userId}
+          AND t.completedAt IS NOT NULL
+          AND t.approved = FALSE
+        ORDER BY t.completedAt DESC
+      `);
+      
+      res.json(tasks[0] || []);
+    } catch (error) {
+      console.error("Error fetching pending tasks:", error);
+      res.status(500).json({ error: "Failed to fetch pending tasks" });
+    }
+  });
+
+  // Approve a task
+  app.post("/api/tasks/:taskId/approve", requireAuth, async (req, res) => {
+    try {
+      const taskId = parseInt(req.params.taskId);
+      const db = await getDb();
+      if (!db) {
+        return res.status(500).json({ error: "Database not available" });
+      }
+      
+      // Verify task belongs to user's kid
+      const [task] = await db.execute(sql`
+        SELECT t.* FROM tasks t
+        JOIN kids k ON t.kidId = k.id
+        WHERE t.id = ${taskId} AND k.userId = ${req.session.userId}
+      `);
+      
+      if (!task[0]) {
+        return res.status(404).json({ error: "Task not found" });
+      }
+      
+      // Approve the task
+      await db.execute(sql`
+        UPDATE tasks SET approved = TRUE WHERE id = ${taskId}
+      `);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error approving task:", error);
+      res.status(500).json({ error: "Failed to approve task" });
+    }
+  });
+
+  // Reject a task (delete it)
+  app.post("/api/tasks/:taskId/reject", requireAuth, async (req, res) => {
+    try {
+      const taskId = parseInt(req.params.taskId);
+      const db = await getDb();
+      if (!db) {
+        return res.status(500).json({ error: "Database not available" });
+      }
+      
+      // Verify task belongs to user's kid
+      const [task] = await db.execute(sql`
+        SELECT t.* FROM tasks t
+        JOIN kids k ON t.kidId = k.id
+        WHERE t.id = ${taskId} AND k.userId = ${req.session.userId}
+      `);
+      
+      if (!task[0]) {
+        return res.status(404).json({ error: "Task not found" });
+      }
+      
+      // Delete the task
+      await db.execute(sql`
+        DELETE FROM tasks WHERE id = ${taskId}
+      `);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error rejecting task:", error);
+      res.status(500).json({ error: "Failed to reject task" });
+    }
+  });
+  
   // ============ Admin Routes ============
   
   // Database reset endpoint (for Railway deployment)

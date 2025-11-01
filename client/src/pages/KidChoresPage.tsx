@@ -21,6 +21,7 @@ interface ActiveTask {
   taskId: number;
   choreId: number;
   choreTitle: string;
+  choreDescription: string;
   paymentAmount: string;
   startTime: number;
 }
@@ -28,6 +29,7 @@ interface ActiveTask {
 export default function KidChoresPage() {
   const { kidId } = useParams<{ kidId: string }>();
   const [chores, setChores] = useState<Chore[]>([]);
+  const [kidName, setKidName] = useState<string>("");
   const [activeTask, setActiveTask] = useState<ActiveTask | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [showCamera, setShowCamera] = useState(false);
@@ -42,9 +44,22 @@ export default function KidChoresPage() {
 
   useEffect(() => {
     if (kidId) {
+      fetchKidInfo();
       fetchAvailableChores();
     }
   }, [kidId]);
+
+  const fetchKidInfo = async () => {
+    try {
+      const response = await fetch(`/api/kids/${kidId}`);
+      if (response.ok) {
+        const kid = await response.json();
+        setKidName(kid.name);
+      }
+    } catch (error) {
+      console.error("Failed to fetch kid info:", error);
+    }
+  };
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -91,6 +106,7 @@ export default function KidChoresPage() {
           taskId: task.id,
           choreId: chore.id,
           choreTitle: chore.title,
+          choreDescription: chore.description,
           paymentAmount: chore.paymentAmount,
           startTime: Date.now(),
         });
@@ -471,31 +487,66 @@ export default function KidChoresPage() {
         </div>
       </div>
 
-      {/* Active Task Timer */}
+      {/* Full-Screen Active Task Timer */}
       {activeTask && (
-        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 shadow-lg">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm opacity-90">Currently working on:</p>
-                <h2 className="text-2xl font-bold">{activeTask.choreTitle}</h2>
-                <p className="text-lg mt-1">Earning: ${activeTask.paymentAmount}</p>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center gap-2 text-4xl font-mono font-bold">
-                  <Clock className="w-8 h-8" />
-                  {formatTime(elapsedTime)}
-                </div>
-                <Button
-                  onClick={handleCompleteClick}
-                  className="mt-4 bg-white text-indigo-600 hover:bg-gray-100"
-                  size="lg"
-                >
-                  <Check className="w-5 h-5 mr-2" />
-                  Complete Task
-                </Button>
+        <div className="fixed inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 z-50 flex flex-col">
+          {/* Header with kid name and cancel */}
+          <div className="p-6 flex items-center justify-between">
+            <div className="text-white">
+              <p className="text-sm opacity-90">Working hard!</p>
+              <h1 className="text-3xl font-bold">{kidName}</h1>
+            </div>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                if (confirm("Are you sure you want to cancel this chore?")) {
+                  // Stop music
+                  if (audioRef.current) {
+                    audioRef.current.pause();
+                    audioRef.current.currentTime = 0;
+                  }
+                  setActiveTask(null);
+                  setElapsedTime(0);
+                  toast({
+                    title: "Chore cancelled",
+                    description: "You can start a different chore now",
+                  });
+                }
+              }}
+              className="text-white hover:bg-white/20 text-lg px-6"
+            >
+              ✕ Cancel Chore
+            </Button>
+          </div>
+
+          {/* Main content - centered */}
+          <div className="flex-1 flex flex-col items-center justify-center px-6 text-center text-white">
+            {/* Timer */}
+            <div className="mb-8">
+              <Clock className="w-20 h-20 mx-auto mb-4 opacity-90" />
+              <div className="text-8xl font-mono font-bold tracking-wider">
+                {formatTime(elapsedTime)}
               </div>
             </div>
+
+            {/* Chore info */}
+            <div className="max-w-2xl">
+              <h2 className="text-4xl font-bold mb-4">{activeTask.choreTitle}</h2>
+              <p className="text-xl opacity-90 mb-6">{activeTask.choreDescription}</p>
+              <div className="inline-block bg-white/20 backdrop-blur-sm px-8 py-4 rounded-full">
+                <p className="text-2xl font-semibold">Earning: ${activeTask.paymentAmount}</p>
+              </div>
+            </div>
+
+            {/* Complete button */}
+            <Button
+              onClick={handleCompleteClick}
+              size="lg"
+              className="mt-12 bg-white text-indigo-600 hover:bg-gray-100 text-2xl px-12 py-8 rounded-full shadow-2xl"
+            >
+              <Check className="w-8 h-8 mr-3" />
+              Complete Task
+            </Button>
           </div>
         </div>
       )}
