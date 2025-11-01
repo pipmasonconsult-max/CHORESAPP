@@ -44,6 +44,14 @@ export default function ParentManagementPage() {
   const [pendingTasks, setPendingTasks] = useState<CompletedTask[]>([]);
   const [selectedKid, setSelectedKid] = useState<Kid | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isCustomChoreDialogOpen, setIsCustomChoreDialogOpen] = useState(false);
+  const [customChore, setCustomChore] = useState({
+    title: "",
+    description: "",
+    paymentAmount: "",
+    frequency: "daily" as "daily" | "weekly" | "monthly",
+    choreType: "individual" as "shared" | "individual",
+  });
 
   useEffect(() => {
     fetchKids();
@@ -333,10 +341,16 @@ export default function ParentManagementPage() {
                     <CardTitle>Manage Chores</CardTitle>
                     <CardDescription>View and manage available chores</CardDescription>
                   </div>
-                  <Button onClick={() => navigate("/chores")}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Assign Chores
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button onClick={() => setIsCustomChoreDialogOpen(true)} variant="outline">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create Custom Chore
+                    </Button>
+                    <Button onClick={() => navigate("/chores")}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Assign Chores
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
@@ -439,6 +453,126 @@ export default function ParentManagementPage() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Custom Chore Creation Dialog */}
+        <Dialog open={isCustomChoreDialogOpen} onOpenChange={setIsCustomChoreDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Create Custom Chore</DialogTitle>
+              <DialogDescription>
+                Add a new custom chore with your own title, description, and payment
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 mt-4">
+              <div>
+                <Label htmlFor="chore-title">Chore Title</Label>
+                <Input
+                  id="chore-title"
+                  value={customChore.title}
+                  onChange={(e) => setCustomChore({ ...customChore, title: e.target.value })}
+                  placeholder="e.g., Organize garage"
+                />
+              </div>
+              <div>
+                <Label htmlFor="chore-description">Description</Label>
+                <Input
+                  id="chore-description"
+                  value={customChore.description}
+                  onChange={(e) => setCustomChore({ ...customChore, description: e.target.value })}
+                  placeholder="e.g., Clean and organize tools"
+                />
+              </div>
+              <div>
+                <Label htmlFor="chore-payment">Payment Amount ($)</Label>
+                <Input
+                  id="chore-payment"
+                  type="number"
+                  step="0.01"
+                  value={customChore.paymentAmount}
+                  onChange={(e) => setCustomChore({ ...customChore, paymentAmount: e.target.value })}
+                  placeholder="5.00"
+                />
+              </div>
+              <div>
+                <Label htmlFor="chore-frequency">Frequency</Label>
+                <select
+                  id="chore-frequency"
+                  value={customChore.frequency}
+                  onChange={(e) => setCustomChore({ ...customChore, frequency: e.target.value as any })}
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </div>
+              <div>
+                <Label htmlFor="chore-type">Chore Type</Label>
+                <select
+                  id="chore-type"
+                  value={customChore.choreType}
+                  onChange={(e) => setCustomChore({ ...customChore, choreType: e.target.value as any })}
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="individual">Individual (assign to specific kids)</option>
+                  <option value="shared">Shared (all kids can do)</option>
+                </select>
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsCustomChoreDialogOpen(false);
+                    setCustomChore({
+                      title: "",
+                      description: "",
+                      paymentAmount: "",
+                      frequency: "daily",
+                      choreType: "individual",
+                    });
+                  }}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={async () => {
+                    if (!customChore.title || !customChore.paymentAmount) {
+                      toast.error("Please fill in title and payment amount");
+                      return;
+                    }
+                    try {
+                      const response = await fetch("/api/chores", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(customChore),
+                      });
+                      if (response.ok) {
+                        toast.success("Custom chore created!");
+                        setIsCustomChoreDialogOpen(false);
+                        setCustomChore({
+                          title: "",
+                          description: "",
+                          paymentAmount: "",
+                          frequency: "daily",
+                          choreType: "individual",
+                        });
+                        fetchChores();
+                      } else {
+                        toast.error("Failed to create chore");
+                      }
+                    } catch (error) {
+                      toast.error("Failed to create chore");
+                    }
+                  }}
+                  className="flex-1"
+                >
+                  Create Chore
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

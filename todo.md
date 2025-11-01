@@ -70,16 +70,16 @@
 - [ ] Update earnings calculation to only count approved tasks
 
 ### Custom Chore Creation
-- [ ] Add "Create Custom Chore" button in parent management
-- [ ] Form to create custom chores with title, description, payment, frequency
-- [ ] Custom chores appear in chore assignment list
-- [ ] Can assign custom chores to specific kids
+- [x] Add "Create Custom Chore" button in parent management
+- [x] Form to create custom chores with title, description, payment, frequency
+- [x] Custom chores appear in chore assignment list
+- [x] Can assign custom chores to specific kids
 
 ## CRITICAL - Task Completion Broken
-- [ ] Debug 500 error when completing tasks
-- [ ] Check if issue is in S3 upload or database update
-- [ ] Test with simplified completion (no photo)
-- [ ] Fix and verify tasks complete successfully
+- [x] Fixed TypeScript errors (requireAuth middleware)
+- [x] Server now starts successfully
+- [ ] Test task completion on Railway
+- [ ] Verify photos upload and save correctly
 
 
 ## Bug - Photos Not Showing
