@@ -93,3 +93,11 @@
 - [x] Pending tasks not showing (completeTask wasn't setting approved=false)
 - [x] Updated completeTask to explicitly set approved=false
 - [x] Ready to deploy and test
+
+
+## Swipeable Dashboard Features
+- [x] Add horizontal swipe carousel for kid profiles
+- [x] Add swipeable task cards (left/right to browse)
+- [x] Implement time-based task filtering (morning/afternoon/evening)
+- [x] Add visual indicators (arrows, dots) for swipe gestures
+- [ ] Test swipe on mobile devices

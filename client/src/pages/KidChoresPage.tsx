@@ -349,8 +349,37 @@ export default function KidChoresPage() {
     return `${hours.toString().padStart(2, "0")}:${(minutes % 60).toString().padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`;
   };
 
+  // Time-based filtering
+  const getTimeOfDay = () => {
+    const hour = new Date().getHours();
+    if (hour >= 6 && hour < 12) return 'morning';
+    if (hour >= 12 && hour < 17) return 'afternoon';
+    if (hour >= 17 && hour < 21) return 'evening';
+    return 'night';
+  };
+
+  const choreTimeMap: Record<string, string[]> = {
+    'Make bed': ['morning'],
+    'Brush teeth': ['morning', 'evening'],
+    'Feed pets': ['morning', 'evening'],
+    'Set the table': ['afternoon', 'evening'],
+    'Clear the table': ['evening'],
+    'Do homework': ['afternoon', 'evening'],
+    'Take out trash': ['evening'],
+    'Water plants': ['morning', 'afternoon'],
+    'Tidy room': ['afternoon', 'evening'],
+    'Put away toys': ['evening'],
+  };
+
+  const isChoreRelevantNow = (choreTitle: string) => {
+    const timeOfDay = getTimeOfDay();
+    const relevantTimes = choreTimeMap[choreTitle];
+    if (!relevantTimes) return true; // Show custom chores always
+    return relevantTimes.includes(timeOfDay);
+  };
+
   const groupedChores = {
-    daily: chores.filter((c) => c.frequency === "daily"),
+    daily: chores.filter((c) => c.frequency === "daily" && isChoreRelevantNow(c.title)),
     weekly: chores.filter((c) => c.frequency === "weekly"),
     monthly: chores.filter((c) => c.frequency === "monthly"),
   };
@@ -575,12 +604,18 @@ export default function KidChoresPage() {
                   </CardContent>
                 </Card>
               ) : (
-                groupedChores[freq].map((chore) => (
+                <div className="overflow-x-auto snap-x snap-mandatory flex gap-4 pb-4 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                  <style>{`
+                    .scrollbar-hide::-webkit-scrollbar {
+                      display: none;
+                    }
+                  `}</style>
+                {groupedChores[freq].map((chore, index) => (
                   <Card
                     key={chore.id}
-                    className={`shadow-md ${
+                    className={`shadow-md snap-center shrink-0 w-[85vw] md:w-[400px] ${
                       !chore.isAvailable ? "opacity-50" : ""
-                    }`}
+                    } ${index === 0 ? 'ml-4' : ''} ${index === groupedChores[freq].length - 1 ? 'mr-4' : ''}`}
                   >
                     <CardHeader>
                       <div className="flex items-start justify-between">
@@ -626,7 +661,8 @@ export default function KidChoresPage() {
                       )}
                     </CardContent>
                   </Card>
-                ))
+                ))}
+                </div>
               )}
             </TabsContent>
           ))}
