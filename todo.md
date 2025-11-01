@@ -39,3 +39,11 @@
 - [x] useRef fix didn't work - buttons still flash then disappear
 - [x] Root cause: conditional rendering based on photoData existence was unreliable
 - [x] Solution: Implemented state machine with explicit cameraView state ('camera' | 'preview')
+
+
+## NEW BUG - Camera Freeze
+- [x] Added comprehensive logging (client and server)
+- [x] Added loading toast "Uploading photo..."
+- [x] Added error handling to close camera on failure
+- [x] Compressed photo to 80% quality to reduce size
+- [ ] Test with detailed logs to identify exact failure point

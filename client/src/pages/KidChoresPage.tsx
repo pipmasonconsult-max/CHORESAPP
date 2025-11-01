@@ -158,10 +158,10 @@ export default function KidChoresPage() {
     canvasRef.current.width = videoRef.current.videoWidth;
     canvasRef.current.height = videoRef.current.videoHeight;
     context.drawImage(videoRef.current, 0, 0);
-    const photo = canvasRef.current.toDataURL("image/jpeg");
-    console.log("[DEBUG] Photo captured, auto-completing task");
+    const photo = canvasRef.current.toDataURL("image/jpeg", 0.8); // Compress to 80% quality
+    console.log("[DEBUG] Photo captured, size:", photo.length, "bytes");
     
-    // Stop camera
+    // Stop camera immediately
     const stream = videoRef.current.srcObject as MediaStream;
     stream?.getTracks().forEach(track => track.stop());
     
@@ -171,39 +171,62 @@ export default function KidChoresPage() {
       audioRef.current.currentTime = 0;
     }
     
+    // Show loading toast
+    toast({
+      title: "Uploading photo...",
+      description: "Please wait",
+    });
+    
     // Auto-complete task with photo
     try {
+      console.log("[DEBUG] Sending completion request...");
       const response = await fetch(`/api/tasks/${activeTask.taskId}/complete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ photo }),
       });
       
+      console.log("[DEBUG] Response status:", response.status);
+      
       if (response.ok) {
+        console.log("[DEBUG] Task completed successfully");
         toast({
           title: "Task completed! 🎉",
           description: `You earned $${activeTask.paymentAmount}!`,
         });
+        
+        // Reset all states
         setActiveTask(null);
         setElapsedTime(0);
         setShowCamera(false);
         setPhotoData(null);
         photoDataRef.current = null;
         setCameraView('camera');
-        fetchAvailableChores();
+        
+        // Refresh chores list
+        await fetchAvailableChores();
       } else {
+        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+        console.error("[DEBUG] Completion failed:", errorData);
         toast({
           title: "Error",
-          description: "Failed to complete task",
+          description: errorData.error || "Failed to complete task",
           variant: "destructive",
         });
+        
+        // Close camera on error
+        setShowCamera(false);
       }
     } catch (error) {
+      console.error("[DEBUG] Exception during completion:", error);
       toast({
         title: "Error",
-        description: "Failed to complete task",
+        description: error instanceof Error ? error.message : "Failed to complete task",
         variant: "destructive",
       });
+      
+      // Close camera on error
+      setShowCamera(false);
     }
   };
 

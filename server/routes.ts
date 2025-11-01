@@ -393,26 +393,34 @@ export function registerRoutes(app: Express) {
   
   app.post("/api/tasks/:taskId/complete", async (req, res) => {
     try {
+      console.log("[SERVER] Task completion request received");
       const taskId = parseInt(req.params.taskId);
       const { photo } = req.body;
+      console.log("[SERVER] TaskId:", taskId, "Has photo:", !!photo);
       
       let photoUrl = null;
       
       // Upload photo to S3 if provided
       if (photo) {
+        console.log("[SERVER] Photo size:", photo.length, "bytes");
         const base64Data = photo.replace(/^data:image\/\w+;base64,/, "");
         const buffer = Buffer.from(base64Data, "base64");
+        console.log("[SERVER] Buffer size:", buffer.length, "bytes");
         const fileName = `task-${taskId}-${Date.now()}.jpg`;
         
+        console.log("[SERVER] Uploading to S3...");
         const { url } = await storagePut(fileName, buffer, "image/jpeg");
         photoUrl = url;
+        console.log("[SERVER] Photo uploaded:", photoUrl);
       }
       
+      console.log("[SERVER] Completing task in database...");
       const task = await completeTask(taskId, photoUrl);
+      console.log("[SERVER] Task completed successfully");
       res.json(task);
     } catch (error) {
-      console.error("Error completing task:", error);
-      res.status(500).json({ error: "Failed to complete task" });
+      console.error("[SERVER] Error completing task:", error);
+      res.status(500).json({ error: error instanceof Error ? error.message : "Failed to complete task" });
     }
   });
   
