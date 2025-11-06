@@ -1,0 +1,31 @@
+{
+  "query": "SHOW TABLES;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2gMNjhBd6xPeT3x.60e134f717f5 --database Htw3cE7SaezoTSkr3yUY4b --execute SHOW TABLES;",
+  "rows": [
+    {
+      "Tables_in_Htw3cE7SaezoTSkr3yUY4b": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_Htw3cE7SaezoTSkr3yUY4b": "chore_assignments"
+    },
+    {
+      "Tables_in_Htw3cE7SaezoTSkr3yUY4b": "chores"
+    },
+    {
+      "Tables_in_Htw3cE7SaezoTSkr3yUY4b": "earning_periods"
+    },
+    {
+      "Tables_in_Htw3cE7SaezoTSkr3yUY4b": "kids"
+    },
+    {
+      "Tables_in_Htw3cE7SaezoTSkr3yUY4b": "tasks"
+    },
+    {
+      "Tables_in_Htw3cE7SaezoTSkr3yUY4b": "users"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_Htw3cE7SaezoTSkr3yUY4b\n__drizzle_migrations\nchore_assignments\nchores\nearning_periods\nkids\ntasks\nusers\n",
+  "stderr": "",
+  "execution_time_ms": 1528
+}

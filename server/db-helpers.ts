@@ -62,12 +62,15 @@ export async function initializePrePopulatedChores(userId: number): Promise<void
   // Insert all pre-populated chores
   const choresToInsert = prePopulatedChores.map(chore => ({
     userId,
-    title: chore.title,
-    description: chore.description,
-    paymentAmount: chore.basePayment.toString(),
-    frequency: chore.frequency,
-    choreType: chore.choreType,
-    isPrePopulated: true,
+      title: chore.title,
+      description: chore.description,
+      paymentAmount: chore.basePayment.toString(),
+      frequency: chore.frequency,
+      choreType: chore.choreType,
+      isPrePopulated: true,
+      startHour: chore.startHour,
+      endHour: chore.endHour,
+      difficulty: chore.difficulty,
   }));
   
   await db.insert(chores).values(choresToInsert);
@@ -254,42 +257,81 @@ export async function getTotalEarningsByKid(kidId: number): Promise<number> {
 
 // ============ Task Availability Logic ============
 
-export async function getAvailableChoresForKid(kidId: number): Promise<Array<Chore & { isAvailable: boolean; completedToday?: boolean }>> {
+export async function getAvailableChoresForKid(kidId: number, timezone: string = "America/New_York"): Promise<Array<Chore & { isAvailable: boolean; completedToday?: boolean }>> {
   const db = await getDb();
   if (!db) return [];
   
   // Get all chores assigned to this kid
   const assignedChores = await getChoreAssignmentsByKid(kidId);
   
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // Get current hour in user's timezone
+  const currentHour = new Date().toLocaleString("en-US", { 
+    timeZone: timezone, 
+    hour: "numeric", 
+    hour12: false 
+  });
+  const currentHourNum = parseInt(currentHour);
+  
+  // Calculate reset boundaries based on timezone
+  const now = new Date();
+  const todayInTimezone = new Date(now.toLocaleString("en-US", { timeZone: timezone }));
+  todayInTimezone.setHours(0, 0, 0, 0);
+  
+  // Calculate start of current week (Monday) in user's timezone
+  const startOfWeek = new Date(todayInTimezone);
+  const dayOfWeek = startOfWeek.getDay();
+  const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Sunday = 0, Monday = 1
+  startOfWeek.setDate(startOfWeek.getDate() - daysToMonday);
+  
+  // Calculate start of current month in user's timezone
+  const startOfMonth = new Date(todayInTimezone);
+  startOfMonth.setDate(1);
   
   const choresWithAvailability = await Promise.all(
     assignedChores.map(async (chore) => {
-      // Check if chore was completed today (for daily chores)
-      const completedToday = await db.select()
+      // Determine the reset boundary based on frequency
+      let resetBoundary: Date;
+      if (chore.frequency === 'daily') {
+        resetBoundary = todayInTimezone;
+      } else if (chore.frequency === 'weekly') {
+        resetBoundary = startOfWeek;
+      } else if (chore.frequency === 'monthly') {
+        resetBoundary = startOfMonth;
+      } else {
+        resetBoundary = todayInTimezone; // fallback
+      }
+      
+      // Check if chore was completed since the last reset
+      const completedSinceReset = await db.select()
         .from(tasks)
         .where(and(
           eq(tasks.choreId, chore.id),
           eq(tasks.kidId, kidId),
-          gte(tasks.completedAt, today),
+          gte(tasks.completedAt, resetBoundary),
           sql`${tasks.completedAt} IS NOT NULL`
         ))
         .limit(1);
       
       let isAvailable = true;
       
-      if (chore.frequency === 'daily' && completedToday.length > 0) {
+      // Time-based filtering: check if chore is within its time window
+      const isInTimeWindow = currentHourNum >= chore.startHour && currentHourNum <= chore.endHour;
+      if (!isInTimeWindow) {
         isAvailable = false;
       }
       
-      // For shared chores, check if another kid completed it today
-      if (chore.choreType === 'shared' && chore.frequency === 'daily') {
+      // Mark as unavailable if completed since last reset
+      if (completedSinceReset.length > 0) {
+        isAvailable = false;
+      }
+      
+      // For shared chores, check if another kid completed it since reset
+      if (chore.choreType === 'shared') {
         const completedByAnyone = await db.select()
           .from(tasks)
           .where(and(
             eq(tasks.choreId, chore.id),
-            gte(tasks.completedAt, today),
+            gte(tasks.completedAt, resetBoundary),
             sql`${tasks.completedAt} IS NOT NULL`
           ))
           .limit(1);
@@ -302,7 +344,7 @@ export async function getAvailableChoresForKid(kidId: number): Promise<Array<Cho
       return {
         ...chore,
         isAvailable,
-        completedToday: completedToday.length > 0,
+        completedToday: completedSinceReset.length > 0,
       };
     })
   );

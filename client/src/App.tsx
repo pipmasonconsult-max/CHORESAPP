@@ -7,19 +7,25 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import LandingPage from "./pages/LandingPage";
 import SetupPage from "./pages/SetupPage";
 import ChoreSetupPage from "./pages/ChoreSetupPage";
-import DashboardPage from "./pages/DashboardPage";
+
 import KidChoresPage from "./pages/KidChoresPage";
 import SettingsPage from "./pages/SettingsPage";
 import NetWorthPage from "./pages/NetWorthPage";
 import ParentManagementPage from "./pages/ParentManagementPage";
+import RoleSelectionPage from "./pages/RoleSelectionPage";
+import ParentLoginPage from "./pages/ParentLoginPage";
+import ChildSelectPage from "./pages/ChildSelectPage";
 
 function Router() {
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<RoleSelectionPage />} />
+      <Route path="/parent-login" element={<ParentLoginPage />} />
+      <Route path="/child-select" element={<ChildSelectPage />} />
+      <Route path="/landing" element={<LandingPage />} />
       <Route path="/setup" element={<SetupPage />} />
       <Route path="/chores" element={<ChoreSetupPage />} />
-      <Route path="/dashboard" element={<DashboardPage />} />
+
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/manage" element={<ParentManagementPage />} />
       <Route path="/kid/:kidId/chores" element={<KidChoresPage />} />
@@ -41,12 +47,12 @@ function App() {
         defaultTheme="light"
         // switchable
       >
-        <TooltipProvider>
-          <Toaster />
-          <BrowserRouter>
+        <BrowserRouter>
+          <TooltipProvider>
+            <Toaster />
             <Router />
-          </BrowserRouter>
-        </TooltipProvider>
+          </TooltipProvider>
+        </BrowserRouter>
       </ThemeProvider>
     </ErrorBoundary>
   );

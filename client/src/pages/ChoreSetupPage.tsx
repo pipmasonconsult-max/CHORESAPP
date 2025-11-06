@@ -141,7 +141,7 @@ export default function ChoreSetupPage() {
 
       setSelectedChores(new Set());
       setSelectedKids(new Set());
-      navigate("/dashboard");
+      navigate("/child-select");
     } catch (error) {
       toast({
         title: "Error",

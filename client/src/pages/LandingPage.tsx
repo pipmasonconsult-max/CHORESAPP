@@ -38,7 +38,7 @@ export default function LandingPage() {
         if (kidsResponse.ok) {
           const kids = await kidsResponse.json();
           if (kids.length > 0) {
-            navigate("/dashboard");
+            navigate("/child-select");
           } else {
             navigate("/setup");
           }

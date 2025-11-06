@@ -11,6 +11,7 @@ export const users = mysqlTable("users", {
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).notNull().default("user"),
   password: text("password"), // for parent login
+  timezone: varchar("timezone", { length: 64 }).default("America/New_York"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow().onUpdateNow(),
   lastSignedIn: timestamp("lastSignedIn").notNull().defaultNow(),
@@ -38,6 +39,9 @@ export const chores = mysqlTable("chores", {
   frequency: mysqlEnum("frequency", ["daily", "weekly", "monthly"]).notNull(),
   choreType: mysqlEnum("chore_type", ["shared", "individual"]).notNull(), // shared (first-come) or individual (per kid)
   isPrePopulated: boolean("is_pre_populated").default(false).notNull(),
+  startHour: int("start_hour").default(0).notNull(), // 0-23, start of time window
+  endHour: int("end_hour").default(23).notNull(), // 0-23, end of time window
+  difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]).default("medium").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

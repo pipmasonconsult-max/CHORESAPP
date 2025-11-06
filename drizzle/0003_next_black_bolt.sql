@@ -1,1 +1,0 @@
-ALTER TABLE `tasks` ADD `approved` boolean DEFAULT false NOT NULL;

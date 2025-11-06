@@ -71,7 +71,7 @@ export default function SettingsPage() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/child-select")}
             className="h-12 w-12"
           >
             <ArrowLeft className="w-6 h-6" />

@@ -2,7 +2,7 @@ import { Express } from "express";
 import { eq, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { getDb } from "./db";
-import { users } from "../drizzle/schema";
+import { users, kids } from "../drizzle/schema";
 import {
   createKid, getKidsByUserId, updateKid, deleteKid,
   getChoresByUserId, createCustomChore, updateChore, deleteChore,
@@ -40,7 +40,10 @@ export function registerRoutes(app: Express) {
       const hashedPassword = await bcrypt.hash(password, 10);
       
       // Create user
+      // Generate a unique openId for local auth users
+      const openId = `local_${username}_${Date.now()}`;
       const result = await db.insert(users).values({
+        openId,
         name: username,
         password: hashedPassword,
         role: "user",
@@ -147,16 +150,69 @@ export function registerRoutes(app: Express) {
     });
   });
   
-  // ============ Kids Management Routes ============
-  
-  app.get("/api/kids", async (req, res) => {
+  // Update user timezone
+  app.put("/api/user/timezone", async (req, res) => {
     if (!req.session?.userId) {
       return res.status(401).json({ error: "Not authenticated" });
     }
     
     try {
-      const kids = await getKidsByUserId(req.session!.userId);
-      res.json(kids);
+      const { timezone } = req.body;
+      
+      if (!timezone) {
+        return res.status(400).json({ error: "Timezone required" });
+      }
+      
+      const db = await getDb();
+      if (!db) {
+        return res.status(500).json({ error: "Database not available" });
+      }
+      
+      await db.update(users)
+        .set({ timezone })
+        .where(eq(users.id, req.session.userId));
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating timezone:", error);
+      res.status(500).json({ error: "Failed to update timezone" });
+    }
+  });
+  
+  // ============ Kids Management Routes ============
+  
+  app.get("/api/kids", async (req, res) => {
+    try {
+      // If authenticated, return only user's kids
+      // If not authenticated, return all kids (for child selection)
+      const userId = req.session?.userId;
+      
+      if (userId) {
+        const kidsData = await getKidsByUserId(userId);
+        // Add earnings to each kid
+        const kidsWithEarnings = await Promise.all(
+          kidsData.map(async (kid) => {
+            const earnings = await getTotalEarningsByKid(kid.id);
+            return { ...kid, earnings };
+          })
+        );
+        res.json(kidsWithEarnings);
+      } else {
+        // Return all kids for child selection page
+        const db = await getDb();
+        if (!db) {
+          return res.status(500).json({ error: "Database not available" });
+        }
+        const allKids = await db.select().from(kids);
+        // Add earnings to each kid
+        const kidsWithEarnings = await Promise.all(
+          allKids.map(async (kid) => {
+            const earnings = await getTotalEarningsByKid(kid.id);
+            return { ...kid, earnings };
+          })
+        );
+        res.json(kidsWithEarnings);
+      }
     } catch (error) {
       console.error("Error fetching kids:", error);
       res.status(500).json({ error: "Failed to fetch kids" });
@@ -372,7 +428,23 @@ export function registerRoutes(app: Express) {
   app.get("/api/kids/:kidId/available-chores", async (req, res) => {
     try {
       const kidId = parseInt(req.params.kidId);
-      const chores = await getAvailableChoresForKid(kidId);
+      
+      // Get user's timezone
+      const db = await getDb();
+      if (!db) {
+        return res.status(500).json({ error: "Database not available" });
+      }
+      
+      // Get kid's parent user to get timezone
+      const kidResult = await db.select().from(kids).where(eq(kids.id, kidId)).limit(1);
+      const kid = kidResult[0];
+      
+      let timezone = "America/New_York";
+      if (kid) {
+        const userResult = await db.select().from(users).where(eq(users.id, kid.userId)).limit(1);
+        timezone = userResult[0]?.timezone || "America/New_York";
+      }
+      const chores = await getAvailableChoresForKid(kidId, timezone);
       res.json(chores);
     } catch (error) {
       console.error("Error fetching available chores:", error);

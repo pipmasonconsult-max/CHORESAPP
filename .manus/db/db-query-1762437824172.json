@@ -1,0 +1,22 @@
+{
+  "query": "SHOW CREATE TABLE chore_assignments;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2gMNjhBd6xPeT3x.60e134f717f5 --database Htw3cE7SaezoTSkr3yUY4b --execute SHOW CREATE TABLE chore_assignments;",
+  "rows": [
+    {
+      "Table": "chore_assignments",
+      "Create Table": "CREATE TABLE `chore_assignments` ("
+    }
+  ],
+  "messages": [
+    "  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,",
+    "  `chore_id` int(11) NOT NULL,",
+    "  `kid_id` int(11) NOT NULL,",
+    "  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  UNIQUE KEY `id` (`id`)",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=30001"
+  ],
+  "stdout": "Table\tCreate Table\nchore_assignments\tCREATE TABLE `chore_assignments` (\n  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n  `chore_id` int(11) NOT NULL,\n  `kid_id` int(11) NOT NULL,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  UNIQUE KEY `id` (`id`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=30001\n",
+  "stderr": "",
+  "execution_time_ms": 1660
+}

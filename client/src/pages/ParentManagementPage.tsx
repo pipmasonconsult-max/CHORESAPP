@@ -51,6 +51,8 @@ export default function ParentManagementPage() {
     paymentAmount: "",
     frequency: "daily" as "daily" | "weekly" | "monthly",
     choreType: "individual" as "shared" | "individual",
+    startHour: 0,
+    endHour: 23,
   });
 
   useEffect(() => {
@@ -187,7 +189,7 @@ export default function ParentManagementPage() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/child-select")}
             className="h-12 w-12"
           >
             <ArrowLeft className="w-6 h-6" />
@@ -435,6 +437,46 @@ export default function ParentManagementPage() {
                 <CardDescription>Manage your account</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="timezone">Timezone</Label>
+                  <select
+                    id="timezone"
+                    className="w-full p-2 border rounded mt-2"
+                    defaultValue="America/New_York"
+                    onChange={async (e) => {
+                      try {
+                        const response = await fetch("/api/user/timezone", {
+                          method: "PUT",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ timezone: e.target.value }),
+                        });
+                        if (response.ok) {
+                          toast.success("Timezone updated!");
+                        } else {
+                          toast.error("Failed to update timezone");
+                        }
+                      } catch (error) {
+                        toast.error("Error updating timezone");
+                      }
+                    }}
+                  >
+                    <optgroup label="US Timezones">
+                      <option value="America/New_York">Eastern Time (ET)</option>
+                      <option value="America/Chicago">Central Time (CT)</option>
+                      <option value="America/Denver">Mountain Time (MT)</option>
+                      <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                      <option value="America/Anchorage">Alaska Time (AKT)</option>
+                      <option value="Pacific/Honolulu">Hawaii Time (HT)</option>
+                    </optgroup>
+                    <optgroup label="Other Timezones">
+                      <option value="Europe/London">London (GMT)</option>
+                      <option value="Europe/Paris">Paris (CET)</option>
+                      <option value="Asia/Tokyo">Tokyo (JST)</option>
+                      <option value="Australia/Sydney">Sydney (AEDT)</option>
+                    </optgroup>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-2">Chores will be shown based on this timezone</p>
+                </div>
                 <Button
                   variant="outline"
                   className="w-full"
@@ -518,6 +560,38 @@ export default function ParentManagementPage() {
                   <option value="shared">Shared (all kids can do)</option>
                 </select>
               </div>
+              <div>
+                <Label>Time of Day (when chore is available)</Label>
+                <div className="grid grid-cols-2 gap-4 mt-2">
+                  <div>
+                    <Label htmlFor="start-hour" className="text-sm">Start Hour</Label>
+                    <select
+                      id="start-hour"
+                      value={customChore.startHour}
+                      onChange={(e) => setCustomChore({ ...customChore, startHour: parseInt(e.target.value) })}
+                      className="w-full p-2 border rounded mt-1"
+                    >
+                      {Array.from({ length: 24 }, (_, i) => (
+                        <option key={i} value={i}>{i === 0 ? '12 AM' : i < 12 ? `${i} AM` : i === 12 ? '12 PM' : `${i - 12} PM`}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <Label htmlFor="end-hour" className="text-sm">End Hour</Label>
+                    <select
+                      id="end-hour"
+                      value={customChore.endHour}
+                      onChange={(e) => setCustomChore({ ...customChore, endHour: parseInt(e.target.value) })}
+                      className="w-full p-2 border rounded mt-1"
+                    >
+                      {Array.from({ length: 24 }, (_, i) => (
+                        <option key={i} value={i}>{i === 0 ? '12 AM' : i < 12 ? `${i} AM` : i === 12 ? '12 PM' : `${i - 12} PM`}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">Kids will only see this chore during the selected time window</p>
+              </div>
               <div className="flex gap-2 pt-4">
                 <Button
                   variant="outline"
@@ -529,6 +603,8 @@ export default function ParentManagementPage() {
                       paymentAmount: "",
                       frequency: "daily",
                       choreType: "individual",
+                      startHour: 0,
+                      endHour: 23,
                     });
                   }}
                   className="flex-1"
@@ -556,6 +632,8 @@ export default function ParentManagementPage() {
                           paymentAmount: "",
                           frequency: "daily",
                           choreType: "individual",
+                          startHour: 0,
+                          endHour: 23,
                         });
                         fetchChores();
                       } else {
