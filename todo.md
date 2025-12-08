@@ -100,4 +100,4 @@
 - [x] Create custom migration script to handle schema changes
 - [x] Update package.json migrate command
 - [x] Test migration locally
-- [ ] Push to GitHub and verify deployment
+- [x] Push to GitHub and verify deployment
