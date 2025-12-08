@@ -67,6 +67,9 @@ export async function initializePrePopulatedChores(userId: number): Promise<void
     paymentAmount: chore.basePayment.toString(),
     frequency: chore.frequency,
     choreType: chore.choreType,
+    difficulty: 'medium' as const,
+    timeWindow: 'anytime' as const,
+    estimatedMinutes: 15,
     isPrePopulated: true,
   }));
   
@@ -109,7 +112,7 @@ export async function deleteChore(choreId: number): Promise<void> {
 
 // ============ Chore Assignments ============
 
-export async function assignChoreToKid(choreId: number, kidId: number): Promise<void> {
+export async function assignChoreToKid(choreId: number, kidId: number, assignedBy: number): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
@@ -120,7 +123,7 @@ export async function assignChoreToKid(choreId: number, kidId: number): Promise<
     .limit(1);
   
   if (existing.length === 0) {
-    await db.insert(choreAssignments).values({ choreId, kidId });
+    await db.insert(choreAssignments).values({ choreId, kidId, assignedBy });
   }
 }
 
@@ -131,7 +134,7 @@ export async function assignChoreToAllKids(choreId: number, userId: number): Pro
   const userKids = await getKidsByUserId(userId);
   
   for (const kid of userKids) {
-    await assignChoreToKid(choreId, kid.id);
+    await assignChoreToKid(choreId, kid.id, userId);
   }
 }
 
@@ -151,12 +154,17 @@ export async function getChoreAssignmentsByKid(kidId: number): Promise<Array<Cho
       choreType: chores.choreType,
       isPrePopulated: chores.isPrePopulated,
       createdAt: chores.createdAt,
+      updatedAt: chores.updatedAt,
+      timeWindow: chores.timeWindow,
+      difficulty: chores.difficulty,
+      estimatedMinutes: chores.estimatedMinutes,
+      isActive: chores.isActive,
     })
     .from(choreAssignments)
     .innerJoin(chores, eq(choreAssignments.choreId, chores.id))
     .where(eq(choreAssignments.kidId, kidId));
   
-  return result;
+  return result as any;
 }
 
 export async function removeChoreAssignment(assignmentId: number): Promise<void> {

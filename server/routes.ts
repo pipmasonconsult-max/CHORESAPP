@@ -324,7 +324,7 @@ export function registerRoutes(app: Express) {
       if (assignToAll) {
         await assignChoreToAllKids(choreId, req.session!.userId);
       } else if (kidId) {
-        await assignChoreToKid(choreId, kidId);
+        await assignChoreToKid(choreId, kidId, req.session!.userId);
       } else {
         return res.status(400).json({ error: "Must specify kidId or assignToAll" });
       }
