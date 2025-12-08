@@ -46,13 +46,18 @@
     "@trpc/client": "^11.6.0",
     "@trpc/react-query": "^11.6.0",
     "@trpc/server": "^11.6.0",
+    "@types/bcrypt": "^6.0.0",
+    "@types/howler": "^2.2.12",
     "axios": "^1.12.0",
+    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
+    "canvas-confetti": "^1.9.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "cookie": "^1.0.2",
     "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "dotenv": "^17.2.2",
     "drizzle-orm": "^0.44.5",
     "drizzle-zod": "^0.8.3",
@@ -60,6 +65,7 @@
     "express": "^4.21.2",
     "express-session": "^1.18.2",
     "framer-motion": "^12.23.22",
+    "howler": "^2.2.4",
     "input-otp": "^1.4.2",
     "jose": "6.1.0",
     "lucide-react": "^0.453.0",
@@ -67,18 +73,22 @@
     "nanoid": "^5.1.5",
     "next-themes": "^0.4.6",
     "react": "^19.1.1",
+    "react-confetti": "^6.4.0",
     "react-day-picker": "^9.11.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.64.0",
     "react-resizable-panels": "^3.0.6",
     "react-router-dom": "^7.9.5",
-    "recharts": "^2.15.2",
+    "react-spring": "^10.0.3",
+    "react-swipeable": "^7.0.2",
+    "recharts": "^2.15.4",
     "sonner": "^2.0.7",
     "streamdown": "^1.4.0",
     "superjson": "^1.13.3",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
+    "victory": "^37.3.6",
     "wouter": "^3.3.5",
     "zod": "^4.1.12"
   },
@@ -115,6 +125,9 @@
     },
     "overrides": {
       "tailwindcss>nanoid": "3.3.7"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "bcrypt"
+    ]
   }
 }

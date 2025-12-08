@@ -31,7 +31,7 @@ export function registerRoutes(app: Express) {
       }
       
       // Check if user already exists
-      const existing = await db.select().from(users).where(eq(users.name, username)).limit(1);
+      const existing = await db.select().from(users).where(eq(users.username, username)).limit(1);
       if (existing.length > 0) {
         return res.status(400).json({ error: "Username already exists" });
       }
@@ -41,8 +41,9 @@ export function registerRoutes(app: Express) {
       
       // Create user
       const result = await db.insert(users).values({
-        name: username,
-        password: hashedPassword,
+        username: username,
+        name: username, // Use username as display name initially
+        passwordHash: hashedPassword,
         role: "user",
       });
       
@@ -87,14 +88,14 @@ export function registerRoutes(app: Express) {
         return res.status(500).json({ error: "Database not available" });
       }
       
-      // Find user
-      const [user] = await db.select().from(users).where(eq(users.name, username)).limit(1);
-      if (!user || !user.password) {
+      // Find user by username
+      const [user] = await db.select().from(users).where(eq(users.username, username)).limit(1);
+      if (!user || !user.passwordHash) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
       
       // Verify password
-      const validPassword = await bcrypt.compare(password, user.password);
+      const validPassword = await bcrypt.compare(password, user.passwordHash);
       if (!validPassword) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
@@ -248,7 +249,7 @@ export function registerRoutes(app: Express) {
     }
     
     try {
-      const { title, description, paymentAmount, frequency, choreType } = req.body;
+      const { title, description, paymentAmount, frequency, choreType, difficulty, timeWindow, estimatedMinutes } = req.body;
       
       const chore = await createCustomChore({
         userId: req.session!.userId,
@@ -257,6 +258,9 @@ export function registerRoutes(app: Express) {
         paymentAmount: paymentAmount.toString(),
         frequency,
         choreType,
+        difficulty: difficulty || 'medium',
+        timeWindow: timeWindow || 'anytime',
+        estimatedMinutes: estimatedMinutes || 15,
         isPrePopulated: false,
       });
       

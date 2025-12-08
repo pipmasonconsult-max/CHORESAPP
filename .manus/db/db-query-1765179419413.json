@@ -1,0 +1,9 @@
+{
+  "query": "\nSET FOREIGN_KEY_CHECKS = 0;\nDROP TABLE IF EXISTS payout_history;\nDROP TABLE IF EXISTS achievements;\nDROP TABLE IF EXISTS time_entries;\nDROP TABLE IF EXISTS investments;\nDROP TABLE IF EXISTS investment_options;\nDROP TABLE IF EXISTS transactions;\nDROP TABLE IF EXISTS automatic_transfers;\nDROP TABLE IF EXISTS bank_accounts;\nDROP TABLE IF EXISTS tasks;\nDROP TABLE IF EXISTS chore_assignments;\nDROP TABLE IF EXISTS chores;\nDROP TABLE IF EXISTS kids;\nDROP TABLE IF EXISTS users;\nSET FOREIGN_KEY_CHECKS = 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2gMNjhBd6xPeT3x.60e134f717f5 --database Htw3cE7SaezoTSkr3yUY4b --execute \nSET FOREIGN_KEY_CHECKS = 0;\nDROP TABLE IF EXISTS payout_history;\nDROP TABLE IF EXISTS achievements;\nDROP TABLE IF EXISTS time_entries;\nDROP TABLE IF EXISTS investments;\nDROP TABLE IF EXISTS investment_options;\nDROP TABLE IF EXISTS transactions;\nDROP TABLE IF EXISTS automatic_transfers;\nDROP TABLE IF EXISTS bank_accounts;\nDROP TABLE IF EXISTS tasks;\nDROP TABLE IF EXISTS chore_assignments;\nDROP TABLE IF EXISTS chores;\nDROP TABLE IF EXISTS kids;\nDROP TABLE IF EXISTS users;\nSET FOREIGN_KEY_CHECKS = 1;\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 8935
+}

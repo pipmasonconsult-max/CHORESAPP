@@ -180,7 +180,7 @@ export async function startTask(choreId: number, kidId: number): Promise<Task> {
     choreId,
     kidId,
     startedAt: new Date(),
-    amountEarned: chore.paymentAmount,
+    earningsAmount: chore.paymentAmount,
   };
   
   const result = await db.insert(tasks).values(taskData);
@@ -240,7 +240,7 @@ export async function getTotalEarningsByKid(kidId: number): Promise<number> {
   if (!db) return 0;
   
   const result = await db.select({
-    total: sql<number>`COALESCE(SUM(${tasks.amountEarned}), 0)`
+    total: sql<number>`COALESCE(SUM(${tasks.earningsAmount}), 0)`
   })
   .from(tasks)
   .where(and(
@@ -282,8 +282,8 @@ export async function getAvailableChoresForKid(kidId: number): Promise<Array<Cho
         isAvailable = false;
       }
       
-      // For shared chores, check if another kid completed it today
-      if (chore.choreType === 'shared' && chore.frequency === 'daily') {
+      // For first_come chores, check if another kid completed it today
+      if (chore.choreType === 'first_come' && chore.frequency === 'daily') {
         const completedByAnyone = await db.select()
           .from(tasks)
           .where(and(
