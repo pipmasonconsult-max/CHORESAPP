@@ -186,18 +186,21 @@ CREATE TABLE `transactions` (
 --> statement-breakpoint
 CREATE TABLE `users` (
 	`id` int AUTO_INCREMENT NOT NULL,
+	`google_id` varchar(255),
+	`email` varchar(320) NOT NULL,
+	`name` text NOT NULL,
+	`profile_picture` text,
 	`openId` varchar(64),
-	`email` varchar(320),
 	`loginMethod` varchar(64),
 	`username` varchar(50),
 	`password_hash` varchar(255),
-	`name` text,
 	`role` enum('user','admin') NOT NULL DEFAULT 'user',
 	`timezone` varchar(50) NOT NULL DEFAULT 'America/New_York',
 	`createdAt` timestamp NOT NULL DEFAULT (now()),
 	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	`lastSignedIn` timestamp NOT NULL DEFAULT (now()),
 	CONSTRAINT `users_id` PRIMARY KEY(`id`),
+	CONSTRAINT `users_google_id_unique` UNIQUE(`google_id`),
 	CONSTRAINT `users_openId_unique` UNIQUE(`openId`),
 	CONSTRAINT `users_username_unique` UNIQUE(`username`)
 );
@@ -244,4 +247,5 @@ CREATE INDEX `date_idx` ON `time_entries` (`date`);--> statement-breakpoint
 CREATE INDEX `kid_id_idx` ON `transactions` (`kid_id`);--> statement-breakpoint
 CREATE INDEX `account_id_idx` ON `transactions` (`account_id`);--> statement-breakpoint
 CREATE INDEX `created_at_idx` ON `transactions` (`created_at`);--> statement-breakpoint
-CREATE INDEX `username_idx` ON `users` (`username`);
+CREATE INDEX `google_id_idx` ON `users` (`google_id`);--> statement-breakpoint
+CREATE INDEX `email_idx` ON `users` (`email`);

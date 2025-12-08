@@ -16,8 +16,13 @@ export function registerRoutes(app: Express) {
   
   // ============ Authentication Routes ============
   
-  // Register/Login for parents
+  // Register/Login for parents (DEPRECATED - Use Google OAuth at /auth/google)
   app.post("/api/auth/register", async (req, res) => {
+    return res.status(410).json({ 
+      error: "Username/password registration is deprecated. Please use Google Sign-In.",
+      redirectTo: "/auth/google"
+    });
+    /* COMMENTED OUT - OLD CODE
     try {
       const { username, password } = req.body;
       
@@ -30,9 +35,9 @@ export function registerRoutes(app: Express) {
         return res.status(500).json({ error: "Database not available" });
       }
       
-      // Check if user already exists
-      const existing = await db.select().from(users).where(eq(users.username, username)).limit(1);
-      if (existing.length > 0) {
+      // Check if username exists
+      const [existing] = await db.select().from(users).where(eq(users.username, username)).limit(1);
+      if (existing) {
         return res.status(400).json({ error: "Username already exists" });
       }
       
@@ -43,6 +48,7 @@ export function registerRoutes(app: Express) {
       const result = await db.insert(users).values({
         username: username,
         name: username, // Use username as display name initially
+        email: `${username}@temp.local`, // Temporary email
         passwordHash: hashedPassword,
         role: "user",
       });
@@ -64,16 +70,13 @@ export function registerRoutes(app: Express) {
       
       res.json({ 
         success: true, 
-        user: { 
-          id: newUser.id, 
-          username: newUser.name 
-        } 
-      });
+        user: {      res.json({ success: true, user: { id: userId, username, name: username } });
     } catch (error) {
       console.error("Registration error:", error);
       res.status(500).json({ error: "Registration failed" });
     }
-  });
+    */
+  });;
   
   app.post("/api/auth/login", async (req, res) => {
     try {

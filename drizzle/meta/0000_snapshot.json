@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "a10806e8-7e70-4612-82e9-a5610a3c3d70",
+  "id": "ca9a7afe-8a8d-40aa-930b-4b7844e291bd",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "achievements": {
@@ -1684,9 +1684,9 @@
           "notNull": true,
           "autoincrement": true
         },
-        "openId": {
-          "name": "openId",
-          "type": "varchar(64)",
+        "google_id": {
+          "name": "google_id",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -1694,6 +1694,27 @@
         "email": {
           "name": "email",
           "type": "varchar(320)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "profile_picture": {
+          "name": "profile_picture",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "openId": {
+          "name": "openId",
+          "type": "varchar(64)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -1715,13 +1736,6 @@
         "password_hash": {
           "name": "password_hash",
           "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -1769,10 +1783,17 @@
         }
       },
       "indexes": {
-        "username_idx": {
-          "name": "username_idx",
+        "google_id_idx": {
+          "name": "google_id_idx",
           "columns": [
-            "username"
+            "google_id"
+          ],
+          "isUnique": false
+        },
+        "email_idx": {
+          "name": "email_idx",
+          "columns": [
+            "email"
           ],
           "isUnique": false
         }
@@ -1787,6 +1808,12 @@
         }
       },
       "uniqueConstraints": {
+        "users_google_id_unique": {
+          "name": "users_google_id_unique",
+          "columns": [
+            "google_id"
+          ]
+        },
         "users_openId_unique": {
           "name": "users_openId_unique",
           "columns": [

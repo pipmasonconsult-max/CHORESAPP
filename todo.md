@@ -107,3 +107,20 @@
 - [ ] Test migration locally
 - [ ] Push to GitHub
 - [ ] Verify Railway deployment succeeds
+
+## Remove OAuth Dependency
+- [ ] Remove Manus OAuth initialization from server
+- [ ] Configure standalone session management
+- [ ] Test authentication locally
+- [ ] Push to GitHub and verify deployment
+
+## Google OAuth Authentication
+- [x] Install passport, passport-google-oauth20
+- [x] Update users schema to store Google ID and profile data
+- [x] Implement Google OAuth strategy
+- [x] Create authentication routes (/auth/google, /auth/google/callback)
+- [ ] Update frontend login page with Google Sign-In button
+- [ ] Remove username/password authentication UI
+- [ ] Test authentication flow locally
+- [ ] Configure Google OAuth credentials in Railway
+- [ ] Deploy and verify authentication works

@@ -9,6 +9,9 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { registerRoutes } from "../routes";
+import passport from "../auth/passport";
+import { configurePassport } from "../auth/passport";
+import authRoutes from "../auth/routes";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -51,10 +54,18 @@ async function startServer() {
     }
   }));
   
+  // Initialize Passport
+  configurePassport();
+  app.use(passport.initialize());
+  app.use(passport.session());
+  
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
-  // OAuth callback under /api/oauth/callback
+  // Google OAuth routes
+  app.use('/auth', authRoutes);
+  
+  // OAuth callback under /api/oauth/callback (legacy)
   registerOAuthRoutes(app);
   
   // Register custom API routes

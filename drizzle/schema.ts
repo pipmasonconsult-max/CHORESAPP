@@ -6,15 +6,18 @@ import { relations } from "drizzle-orm";
 
 export const users = mysqlTable("users", {
   id: int("id").primaryKey().autoincrement(),
-  // OAuth fields (keep for compatibility)
-  openId: varchar("openId", { length: 64 }).unique(),
-  email: varchar("email", { length: 320 }),
-  loginMethod: varchar("loginMethod", { length: 64 }),
   
-  // Local authentication fields
+  // Google OAuth fields
+  googleId: varchar("google_id", { length: 255 }).unique(),
+  email: varchar("email", { length: 320 }).notNull(),
+  name: text("name").notNull(),
+  profilePicture: text("profile_picture"),
+  
+  // Legacy fields (for backward compatibility, can be removed later)
+  openId: varchar("openId", { length: 64 }).unique(),
+  loginMethod: varchar("loginMethod", { length: 64 }),
   username: varchar("username", { length: 50 }).unique(),
-  passwordHash: varchar("password_hash", { length: 255 }), // bcrypt hash
-  name: text("name"),
+  passwordHash: varchar("password_hash", { length: 255 }),
   
   role: mysqlEnum("role", ["user", "admin"]).notNull().default("user"),
   timezone: varchar("timezone", { length: 50 }).default("America/New_York").notNull(),
@@ -23,7 +26,8 @@ export const users = mysqlTable("users", {
   updatedAt: timestamp("updatedAt").notNull().defaultNow().onUpdateNow(),
   lastSignedIn: timestamp("lastSignedIn").notNull().defaultNow(),
 }, (table) => ({
-  usernameIdx: index("username_idx").on(table.username),
+  googleIdIdx: index("google_id_idx").on(table.googleId),
+  emailIdx: index("email_idx").on(table.email),
 }));
 
 // ============= KID PROFILES =============
