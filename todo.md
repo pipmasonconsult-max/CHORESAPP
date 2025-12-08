@@ -101,3 +101,9 @@
 - [x] Update package.json migrate command
 - [x] Test migration locally
 - [x] Push to GitHub and verify deployment
+
+## Comprehensive Migration Fix
+- [ ] Update migration script to create all 15 tables
+- [ ] Test migration locally
+- [ ] Push to GitHub
+- [ ] Verify Railway deployment succeeds
