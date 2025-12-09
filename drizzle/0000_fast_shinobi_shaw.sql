@@ -205,27 +205,6 @@ CREATE TABLE IF NOT EXISTS `users` (
 	CONSTRAINT `users_username_unique` UNIQUE(`username`)
 );
 --> statement-breakpoint
-ALTER TABLE `achievements` ADD CONSTRAINT `achievements_kid_id_kids_id_fk` FOREIGN KEY (`kid_id`) REFERENCES `kids`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `automatic_transfers` ADD CONSTRAINT `automatic_transfers_kid_id_kids_id_fk` FOREIGN KEY (`kid_id`) REFERENCES `kids`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `automatic_transfers` ADD CONSTRAINT `automatic_transfers_source_account_id_bank_accounts_id_fk` FOREIGN KEY (`source_account_id`) REFERENCES `bank_accounts`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `automatic_transfers` ADD CONSTRAINT `automatic_transfers_destination_account_id_bank_accounts_id_fk` FOREIGN KEY (`destination_account_id`) REFERENCES `bank_accounts`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `bank_accounts` ADD CONSTRAINT `bank_accounts_kid_id_kids_id_fk` FOREIGN KEY (`kid_id`) REFERENCES `kids`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `chore_assignments` ADD CONSTRAINT `chore_assignments_chore_id_chores_id_fk` FOREIGN KEY (`chore_id`) REFERENCES `chores`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `chore_assignments` ADD CONSTRAINT `chore_assignments_kid_id_kids_id_fk` FOREIGN KEY (`kid_id`) REFERENCES `kids`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `chore_assignments` ADD CONSTRAINT `chore_assignments_assigned_by_users_id_fk` FOREIGN KEY (`assigned_by`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `chores` ADD CONSTRAINT `chores_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `investment_options` ADD CONSTRAINT `investment_options_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `investments` ADD CONSTRAINT `investments_kid_id_kids_id_fk` FOREIGN KEY (`kid_id`) REFERENCES `kids`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `investments` ADD CONSTRAINT `investments_account_id_bank_accounts_id_fk` FOREIGN KEY (`account_id`) REFERENCES `bank_accounts`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `investments` ADD CONSTRAINT `investments_option_id_investment_options_id_fk` FOREIGN KEY (`option_id`) REFERENCES `investment_options`(`id`) ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `kids` ADD CONSTRAINT `kids_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `payout_history` ADD CONSTRAINT `payout_history_kid_id_kids_id_fk` FOREIGN KEY (`kid_id`) REFERENCES `kids`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `tasks` ADD CONSTRAINT `tasks_chore_id_chores_id_fk` FOREIGN KEY (`chore_id`) REFERENCES `chores`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `tasks` ADD CONSTRAINT `tasks_kid_id_kids_id_fk` FOREIGN KEY (`kid_id`) REFERENCES `kids`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `time_entries` ADD CONSTRAINT `time_entries_kid_id_kids_id_fk` FOREIGN KEY (`kid_id`) REFERENCES `kids`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `time_entries` ADD CONSTRAINT `time_entries_task_id_tasks_id_fk` FOREIGN KEY (`task_id`) REFERENCES `tasks`(`id`) ON DELETE set null ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `transactions` ADD CONSTRAINT `transactions_kid_id_kids_id_fk` FOREIGN KEY (`kid_id`) REFERENCES `kids`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `transactions` ADD CONSTRAINT `transactions_account_id_bank_accounts_id_fk` FOREIGN KEY (`account_id`) REFERENCES `bank_accounts`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX `kid_id_idx` ON `achievements` (`kid_id`);--> statement-breakpoint
 CREATE INDEX `kid_id_idx` ON `automatic_transfers` (`kid_id`);--> statement-breakpoint
 CREATE INDEX `kid_id_idx` ON `bank_accounts` (`kid_id`);--> statement-breakpoint

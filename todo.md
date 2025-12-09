@@ -138,5 +138,10 @@
 ## Fix Railway Deployment Crash
 - [x] Update migration script to use CREATE TABLE IF NOT EXISTS
 - [x] Test migration locally
+- [x] Push to GitHub
+- [ ] Verify Railway deployment succeeds
+
+## Fix Duplicate Foreign Key Constraints
+- [x] Remove ALTER TABLE ADD CONSTRAINT statements from migration
 - [ ] Push to GitHub
 - [ ] Verify Railway deployment succeeds
