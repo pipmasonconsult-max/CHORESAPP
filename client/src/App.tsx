@@ -4,7 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import LandingPage from "./pages/LandingPage";
+import LoginPage from "./pages/LoginPage";
 import SetupPage from "./pages/SetupPage";
 import ChoreSetupPage from "./pages/ChoreSetupPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -15,7 +15,7 @@ import NetWorthPage from "./pages/NetWorthPage";
 function Router() {
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<LoginPage />} />
       <Route path="/setup" element={<SetupPage />} />
       <Route path="/chores" element={<ChoreSetupPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />

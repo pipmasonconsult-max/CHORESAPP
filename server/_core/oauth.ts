@@ -30,8 +30,8 @@ export function registerOAuthRoutes(app: Express) {
 
       await db.upsertUser({
         openId: userInfo.openId,
-        name: userInfo.name || null,
-        email: userInfo.email ?? null,
+        name: userInfo.name || 'Unknown User',
+        email: userInfo.email || 'unknown@temp.local',
         loginMethod: userInfo.loginMethod ?? userInfo.platform ?? null,
         lastSignedIn: new Date(),
       });

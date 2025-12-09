@@ -133,6 +133,46 @@
   }
 }
 
+@layer utilities {
+  /* iOS Liquid Glass Effects */
+  .glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  
+  .glass-dark {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  
+  .ios-button {
+    @apply rounded-xl font-semibold transition-all duration-200 active:scale-95;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .ios-input {
+    @apply rounded-xl border-0 bg-white/80 backdrop-blur-md px-4 py-3 transition-all duration-200;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .ios-input:focus {
+    @apply ring-2 ring-blue-500/50 bg-white;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+  }
+}
+
 @layer components {
   /**
    * Custom container utility that centers content and adds responsive padding.
