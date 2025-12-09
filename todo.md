@@ -134,3 +134,9 @@
 - [ ] Test UI on different screen sizes
 - [x] Fix remaining TypeScript errors
 - [x] Push to GitHub for deployment
+
+## Fix Railway Deployment Crash
+- [x] Update migration script to use CREATE TABLE IF NOT EXISTS
+- [x] Test migration locally
+- [ ] Push to GitHub
+- [ ] Verify Railway deployment succeeds

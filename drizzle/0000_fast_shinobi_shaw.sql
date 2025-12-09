@@ -1,4 +1,4 @@
-CREATE TABLE `achievements` (
+CREATE TABLE IF NOT EXISTS `achievements` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`kid_id` int NOT NULL,
 	`type` enum('hours_milestone','earnings_milestone','streak','investment_return','savings_goal') NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE `achievements` (
 	CONSTRAINT `achievements_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `automatic_transfers` (
+CREATE TABLE IF NOT EXISTS `automatic_transfers` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`kid_id` int NOT NULL,
 	`source_account_id` int NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE `automatic_transfers` (
 	CONSTRAINT `automatic_transfers_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `bank_accounts` (
+CREATE TABLE IF NOT EXISTS `bank_accounts` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`kid_id` int NOT NULL,
 	`name` varchar(100) NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE `bank_accounts` (
 	CONSTRAINT `bank_accounts_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `chore_assignments` (
+CREATE TABLE IF NOT EXISTS `chore_assignments` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`chore_id` int NOT NULL,
 	`kid_id` int,
@@ -53,7 +53,7 @@ CREATE TABLE `chore_assignments` (
 	CONSTRAINT `chore_assignments_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `chores` (
+CREATE TABLE IF NOT EXISTS `chores` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`user_id` int,
 	`title` text NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE `chores` (
 	CONSTRAINT `chores_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `investment_options` (
+CREATE TABLE IF NOT EXISTS `investment_options` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`user_id` int NOT NULL,
 	`name` varchar(100) NOT NULL,
@@ -88,7 +88,7 @@ CREATE TABLE `investment_options` (
 	CONSTRAINT `investment_options_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `investments` (
+CREATE TABLE IF NOT EXISTS `investments` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`kid_id` int NOT NULL,
 	`account_id` int NOT NULL,
@@ -106,7 +106,7 @@ CREATE TABLE `investments` (
 	CONSTRAINT `investments_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `kids` (
+CREATE TABLE IF NOT EXISTS `kids` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`user_id` int NOT NULL,
 	`name` text NOT NULL,
@@ -129,7 +129,7 @@ CREATE TABLE `kids` (
 	CONSTRAINT `kids_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `payout_history` (
+CREATE TABLE IF NOT EXISTS `payout_history` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`kid_id` int NOT NULL,
 	`amount` decimal(10,2) NOT NULL,
@@ -142,7 +142,7 @@ CREATE TABLE `payout_history` (
 	CONSTRAINT `payout_history_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `tasks` (
+CREATE TABLE IF NOT EXISTS `tasks` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`chore_id` int NOT NULL,
 	`kid_id` int NOT NULL,
@@ -160,7 +160,7 @@ CREATE TABLE `tasks` (
 	CONSTRAINT `tasks_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `time_entries` (
+CREATE TABLE IF NOT EXISTS `time_entries` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`kid_id` int NOT NULL,
 	`task_id` int,
@@ -170,7 +170,7 @@ CREATE TABLE `time_entries` (
 	CONSTRAINT `time_entries_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `transactions` (
+CREATE TABLE IF NOT EXISTS `transactions` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`kid_id` int NOT NULL,
 	`account_id` int NOT NULL,
@@ -184,7 +184,7 @@ CREATE TABLE `transactions` (
 	CONSTRAINT `transactions_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`google_id` varchar(255),
 	`email` varchar(320) NOT NULL,
